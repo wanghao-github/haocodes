@@ -1,0 +1,15 @@
+#!/bin/bash
+for file in ./*
+do
+   if test -f "$file"
+   then
+       echo "$file" is_a_file
+   else
+       echo "$file" is_a_directory
+       cd "$file"
+       grep -A 17 "magnetization (x)" OUTCAR | tail -12 | awk '{print $6}' >> ../magnetic_moment_log
+       cd ..
+   fi
+done
+
+sed -i 's/U_//' magnetic_moment_log

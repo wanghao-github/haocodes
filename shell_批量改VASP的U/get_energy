@@ -1,0 +1,15 @@
+#!/bin/bash
+for file in ./*
+do
+   if test -f "$file"
+   then
+       echo "$file" is_a_file
+   else
+       echo "$file" is_a_directory
+       cd "$file"
+       echo  $(basename `pwd`)  `grep "free  energy   TOTEN" OUTCAR | awk '{print $5}'`  >>../energy_log	
+       cd ..
+   fi
+done
+
+sed -i 's/U_//' energy_log

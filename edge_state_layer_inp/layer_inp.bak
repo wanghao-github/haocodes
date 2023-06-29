@@ -1,0 +1,12 @@
+ 2
+ 4
+  1 2 3 3 3 3 3 3 3 3 3 4 4 4 4 1 2 3 3 3 3 3 3 3 3 3 4 4 4 4 
+ 0.33333  -0.33333   0.68779 
+ 0.33333  -0.33333   0.31221 
+ 0.00000   0.00000   0.50000 
+ -0.33333   0.33333   0.50000
+ 0  0		!N cutaway upper, lower end
+ 1  2            !cut atoms from top
+ 1  2		!cut atoms from bottom
+ 1		!fourdim
+ 2  1          !layerdir, fourdir(:)

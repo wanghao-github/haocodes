@@ -1,0 +1,17 @@
+ 10.470972   0.000000   0.000000
+ -5.235486   9.068128   0.000000
+  0.000000   0.000000  17.073676
+ 9.0 10.0 80               ! fermi_min,fermi_max,num_steps
+ 50 50 50               ! grid
+ 3                         ! maxdim
+ t f                       ! l_tb,l_nabla
+ t 0.0 0.0 0.00            ! l_bfield,bfield            
+ 76                        ! occupation_number
+ f 0.00                    !
+ 0.1                       ! temperature
+ f                         ! switch for magnetic direction
+ 0                         ! strength for magnetic
+ 0                         ! mag_theta
+ 0                         ! mag_phi
+ 40                        ! number of magnetic atom's wannier orbital
+ 13 14 15 16 17 18 19 20 33 34 35 36 37 38 39 40      !index of magnetic atom's wannier orbital   
