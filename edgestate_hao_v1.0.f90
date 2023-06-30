@@ -346,7 +346,6 @@ program hao_edgestates
             eigvals_per_k(ik,ib) = eigvals(ib)
         enddo
     enddo
-
     if(irank.eq.0)then   
         open(222,file='kpts.out',recl=10000)
         do ik=1,numkpts
