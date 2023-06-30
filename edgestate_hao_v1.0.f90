@@ -280,7 +280,6 @@ program hao_edgestates
         allocate(excludedown(nexcludedown))
     endif
     call mpi_bcast(excludedown,nexcludedown,MPI_INTEGER,0,mpi_comm_world,ierr)
-
     if(.not.allocated(layerintarr))then 
         allocate(layerintarr(Hdim))
     endif
