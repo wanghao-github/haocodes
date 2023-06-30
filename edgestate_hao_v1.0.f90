@@ -314,7 +314,6 @@ program hao_edgestates
         ik_cpu=ik_cpu+1
         if(mod(ik_cpu-1,isize).ne.irank) cycle
 
-        
             write(*,*) "ik", ik, "k(ik)=", k(ik),"irank=",irank
             eigvals_per_k(ik,:)=0
             fourHamilton=0d0
