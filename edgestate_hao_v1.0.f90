@@ -368,5 +368,4 @@ program hao_edgestates
     write(*,*) "size of hamiltonian", size(hamiltonian)
     call mpi_barrier(mpi_comm_world,ierr)
     call MPI_Finalize(ierr)
-    
 end program hao_edgestates
