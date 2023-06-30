@@ -285,6 +285,7 @@ program hao_edgestates
     endif
     call mpi_bcast(layerintarr,Hdim,MPI_INTEGER,0,mpi_comm_world,ierr)
 
+    
         allocate(eigvals(Hdim))
         allocate(eigvecs(Hdim,Hdim))
         lwork=12.0*Hdim
