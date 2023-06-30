@@ -31,7 +31,7 @@ program hao_edgestates
     integer,allocatable  :: wannierfunctions(:)	!numbers of wannierfunctions attributed to the atom
     end type atom
 
-    type(atom), allocatable ::   atomarr(:)
+    type(atom), allocatable :: atomarr(:)
 
     INCLUDE 'mpif.h'
     integer :: stt(MPI_STATUS_SIZE)
@@ -72,7 +72,7 @@ program hao_edgestates
 211     continue
         close(200)
     endif
-
+!!!!!!!! read the hopping file
     if(irank.eq.0)then
         write(*,*) "irank=", irank
         write(*,*)"rvecnum=",rvecnum
@@ -143,6 +143,9 @@ program hao_edgestates
         read(100,'(I3,<fourdim>I3)')            layerdir,fourdir(:) 
         close(100)
     endif
+
+!!!!!!!!!!!  read the layer_inp
+
 
     allocate(nrpts(rvecnum))
 
