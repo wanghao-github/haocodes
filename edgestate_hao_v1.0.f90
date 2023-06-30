@@ -235,7 +235,6 @@ program hao_edgestates
         do i=1,Hdim
             localisationpar(i)=-1d0+2d0*(localisationpar(i)-locmin)/(locmax-locmin)
         enddo
-
         layerspreadmin=0
         layerspreadmax=0
         do i=1,rvecnum
