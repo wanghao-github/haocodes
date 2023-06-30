@@ -317,6 +317,7 @@ program hao_edgestates
             eigvals_per_k(ik,:)=0
             fourHamilton=0d0
             do ii=1,rvecnum   
+                
                 do i=1,num_wann
                     do j=1,num_wann
                         phase=0d0
