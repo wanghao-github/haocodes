@@ -24,6 +24,7 @@ program hao_edgestates
     integer,allocatable  :: iwork(:)
     real,allocatable     :: rwork(:)
     integer,allocatable  :: ifail(:)
+
     type                 :: atom
     integer              :: number
     real(kind=8)         :: position(3)		    !position in realspace
