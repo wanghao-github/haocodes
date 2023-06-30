@@ -42,7 +42,6 @@ program hao_edgestates
     abstol=2.0*tiny(abstol)
     pi = 3.14159265
     numkpts = 400
-
     if(irank.eq.0)then
         write(*,*) "isize=", isize
         open(200,file='hopping.1')
