@@ -308,7 +308,6 @@ program hao_edgestates
             k(ik) = ik*3*pi/numkpts
         enddo
     endif
-    
     ik_cpu = 0
     do ik=1,numkpts
         ik_cpu=ik_cpu+1
