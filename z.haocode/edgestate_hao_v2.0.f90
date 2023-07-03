@@ -182,7 +182,7 @@ program hao_edgestates
         i=1
         allocate(layerintarr(Hdim))
         do while(i.le.Hdim)
-            if(i.le.num_wann-nwannexup)then !
+            if(i.le.num_wann-nwannexup)then ! 轨道编号在第一个原胞之内
                 i1=1
                 i2=1
                 do while (i.le.num_wann-nwannexup)
@@ -197,16 +197,18 @@ program hao_edgestates
                             i2=1         !超过了每个原子上的wannier轨道个数后重新计数
                             i1=i1+1      !切换到下一个原子
                         endif
-                        i=i+1
+                        i=i+1     !切换到下个wannier轨道
                     else
                         i1=i1+1   !如果这个原子被排除了
                     endif
                 enddo
-            elseif(i.le.Hdim+nwannexdown-num_wann)then
-                do i1=1,ndiffatom
-                    do i2=1,size(atomarr(i1)%wannierfunctions(:))
-                        wannierfunctioninHam(i)=atomarr(i1)%wannierfunctions(i2)
+            elseif(i.le.Hdim+nwannexdown-num_wann)then   !除了第一个原胞外的其他轨道
+                do i1=1,ndiffatom                         ! 遍历所有原子
+                    do i2=1,size(atomarr(i1)%wannierfunctions(:))        !i2仍然是每个原子上的wannier轨道个数
+                        wannierfunctioninHam(i)=atomarr(i1)%wannierfunctions(i2)!把每个原子上的wannier轨道个数存到超胞wannierfunctioninHam里面
                         localisationpar(i)=atomarr(i1)%position(layerdir)+numberlayer-(i+nwannexup-1)/num_wann-1
+                        !每个原子在超胞中的位置  相比较于上一个在最边缘的多减了(i+nwannexup-1)/num_wann这一项 假如i是48 num_wann是44的话这样就多减了1 因为
+                        !Fortran 整型相除舍弃了小数部分 相当于把layerdir那个方向的加了一个整数 直到-2 -3 -4 ....
                         layerintarr(i)=(i+nwannexup-1)/num_wann+1
                         i=i+1
                     enddo
