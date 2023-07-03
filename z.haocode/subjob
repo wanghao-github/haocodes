@@ -1,0 +1,13 @@
+#!/bin/sh
+#SBATCH -J fleur
+#SBATCH --ntasks-per-node=32
+#SBATCH --cpus-per-task=1
+#SBATCH -o mpi-out.%j
+#SBATCH -e mpi-err.%j
+#SBATCH -p th1-2020-32
+
+ulimit -s unlimited
+source compiler-select intel
+export OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK}
+
+srun ./edgestate_hao_v2.0.x > log
