@@ -182,24 +182,24 @@ program hao_edgestates
         i=1
         allocate(layerintarr(Hdim))
         do while(i.le.Hdim)
-            if(i.le.num_wann-nwannexup)then
+            if(i.le.num_wann-nwannexup)then !
                 i1=1
                 i2=1
                 do while (i.le.num_wann-nwannexup)
-                    if(.not.ANY(excludeup==i1))then
+                    if(.not.ANY(excludeup==i1))then   !如果i1不在任何排除的轨道之内
                         wannierfunctioninHam(i)=atomarr(i1)%wannierfunctions(i2)
                         localisationpar(i)=atomarr(i1)%position(layerdir)+numberlayer-1
                         layerintarr(i)=1 
     
-                        if(i2.lt.size(atomarr(i1)%wannierfunctions(:)))then
-                            i2=i2+1
+                        if(i2.lt.size(atomarr(i1)%wannierfunctions(:)))then !i2是每个原子上的wannier的个数
+                            i2=i2+1                                            
                         else
-                            i2=1
-                            i1=i1+1
+                            i2=1         !超过了每个原子上的wannier轨道个数后重新计数
+                            i1=i1+1      !切换到下一个原子
                         endif
                         i=i+1
                     else
-                        i1=i1+1
+                        i1=i1+1   !如果这个原子被排除了
                     endif
                 enddo
             elseif(i.le.Hdim+nwannexdown-num_wann)then
