@@ -16,7 +16,7 @@ program hao_edgestates
     integer,allocatable  :: wannperat(:),atomnumberarray(:),fourdir(:),layerintarr(:)
     integer,allocatable  :: excludeup(:),excludedown(:),temp(:),wannierfunctioninHam(:)
     integer              :: ndiffatom,nexcludeup,nexcludedown,return_num_wann,locmin,locmax,i1,i2
-    real                 :: vl,vu,abstol,ik1
+    real                 :: vl,vu,abstol,ik1,time_start,time_end
     integer              :: length,length1,length2,length3,length4
     real,allocatable     :: eigvals(:),eigvals_per_k(:,:)
     complex,allocatable  :: eigvecs(:,:)
@@ -338,17 +338,25 @@ program hao_edgestates
     write(*,*)"noproblem_here3" ,irank  
     ik_cpu = 0
     eigvals_per_k(:,:)=0
-    do ik=1,numkpts
+    ! do ik=1,numkpts
   !  do ik= 1, 10
          !write(*,*) "mod(ik-1,isize)", mod(ik-1,isize)
            !call mpi_bcast(ik_cpu,1,MPI_INTEGER,0,mpi_comm_world,ierr)
         !if(mod(ik_cpu-1,isize).ne.irank) cycle
-       ik_cpu=ik_cpu+1
+    !    ik_cpu=ik_cpu+1
      !   call MPI_Barrier(MPI_COMM_WORLD, ierr)
      !  write(*,*) "beforeik", ik, "beforeikcpu", ik_cpu,"irank",irank
-        if (mod(ik_cpu-1,isize) /= irank) cycle
+        ! if (mod(ik_cpu-1,isize) /= irank) cycle
  !           write(*,*) "hello"
             !eigvals_per_k(ik,:)=0
+
+    do ik= 1+ irank, numkpts, isize
+        if (irank .eq. 0 .and. mod(ik/isize, 1) .eq. 0) then
+         call now(time_end) 
+          write(*, '(a, i18, "/", i18, a, f10.2, "s")') 'ik/knv3', &
+           ik, numkpts, '  time left', (numkpts-ik)*(time_end-time_start)/isize
+           time_start= time_end
+        endif
             fourHamilton=0d0
             do ii=1,rvecnum   
                 do i=1,num_wann
@@ -426,3 +434,13 @@ enddo
     call mpi_barrier(mpi_comm_world,ierr)
     call MPI_Finalize(ierr)
 end program hao_edgestates
+subroutine now(time_now)
+
+    implicit none
+    integer   :: time_new(8)
+    real      :: time_now
+    call Date_and_time(values=time_new)
+    time_now= time_new(3)*24*3600+time_new(5)*3600+&
+              time_new(6)*60+time_new(7)+time_new(8)/1000d0  
+    return
+ end subroutine now
