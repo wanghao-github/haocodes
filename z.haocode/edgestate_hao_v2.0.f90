@@ -176,14 +176,14 @@ program hao_edgestates
     call mpi_bcast(nrpts,rvecnum,MPI_INTEGER,0,mpi_comm_world,ierr)
     call mpi_bcast(numberlayer,1,MPI_INTEGER,0,mpi_comm_world,ierr)
     call mpi_bcast(ndiffatom,1,MPI_INTEGER,0,mpi_comm_world,ierr)
-    write(*,*) "hereeeee" 
+    write(*,*) "ndiffatom = ",ndiffatom,irank 
 
     call mpi_bcast(fourdim,1,MPI_INTEGER,0,mpi_comm_world,ierr)
-    write(*,*) "he" 
+    write(*,*) "fourdim=",fourdim,irank 
     call mpi_bcast(fourdir,size(fourdir),MPI_INTEGER,0,mpi_comm_world,ierr)
-    write(*,*) "hsdasdasdasd" 
+    write(*,*) "fourdir=",fourdir,irank 
     call mpi_bcast(layerdir,1,MPI_INTEGER,0,mpi_comm_world,ierr)
-    write(*,*) "inrank =",irank 
+    write(*,*) "layerdir =",layerdir,irank 
 
     call MPI_Barrier(mpi_comm_world, ierr)
 
