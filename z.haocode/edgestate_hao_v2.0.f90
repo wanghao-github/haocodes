@@ -337,16 +337,37 @@ program hao_edgestates
         allocate(ifail(Hdim) )
         allocate(k(numkpts))
         k=0.0
+
+        if (irank.eq.0) then    
+            write(*,*)"here is no problem7"
+          endif
+
         allocate(fourHamilton(layerspreadmin:layerspreadmax,num_wann,num_wann))
         allocate(hamiltonian(Hdim,Hdim))
+
+        if (irank.eq.0) then    
+            write(*,*)"here is no problem8"
+          endif
+
         call mpi_bcast(fourdirection,1,MPI_INTEGER,0,mpi_comm_world,ierr)
         call mpi_bcast(fourdir,size(fourdir),MPI_INTEGER,0,mpi_comm_world,ierr)
         call mpi_bcast(fourdim,1,MPI_INTEGER,0,mpi_comm_world,ierr)
         call mpi_bcast(numkpts,1,MPI_INTEGER,0,mpi_comm_world,ierr)
+        
+        if (irank.eq.0) then    
+            write(*,*)"here is no problem9"
+          endif
+
         call mpi_bcast(fourHamilton,size(fourHamilton),MPI_DOUBLE_PRECISION,0,mpi_comm_world,ierr)
         call mpi_bcast(hamiltonian,size(hamiltonian),MPI_DOUBLE_PRECISION,0,mpi_comm_world,ierr)
         call mpi_bcast(wannierfunctioninham,size(wannierfunctioninham),MPI_INTEGER,0,mpi_comm_world,ierr)
-    if(irank.eq.0)then 
+  
+  
+        if (irank.eq.0) then    
+            write(*,*)"here is no problem10"
+          endif
+  
+        if(irank.eq.0)then 
         do ik=1,numkpts
             k(ik) = ik*3*pi/numkpts
         enddo
