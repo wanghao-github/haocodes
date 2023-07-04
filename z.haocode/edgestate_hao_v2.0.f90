@@ -346,7 +346,7 @@ program hao_edgestates
        ik_cpu=ik_cpu+1
      !   call MPI_Barrier(MPI_COMM_WORLD, ierr)
      !  write(*,*) "beforeik", ik, "beforeikcpu", ik_cpu,"irank",irank
-        if (mod(ik_cpu-1,isize) /= irank) cycle
+ !       if (mod(ik_cpu-1,isize) /= irank) cycle
  !           write(*,*) "hello"
             !eigvals_per_k(ik,:)=0
             fourHamilton=0d0
