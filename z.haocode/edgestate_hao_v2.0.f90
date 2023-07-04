@@ -307,7 +307,7 @@ program hao_edgestates
             call MPI_Send(Hdim, 1, MPI_INTEGER, i, 0, mpi_comm_world, ierr)
         end do
     else
-        call MPI_Recv(Hdim, 1, MPI_INTEGER, 0, 0, mpi_comm_world, status, ierr)
+        call MPI_Recv(Hdim, 1, MPI_INTEGER, 0, 0, mpi_comm_world, stt, ierr)
     end if
     
     ! 所有进程在此处等待，直到所有进程都接收到了Hdim的值
