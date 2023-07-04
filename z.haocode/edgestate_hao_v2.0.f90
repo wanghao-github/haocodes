@@ -351,7 +351,7 @@ program hao_edgestates
             !eigvals_per_k(ik,:)=0
 
     do ik= 1+ irank, numkpts, isize
-        write(*,*) "k loop start","ik=",ik
+        write(*,*) "k loop start ik=",ik, "irank=",irank
         if (irank .eq. 0 .and. mod(ik/isize, 1) .eq. 0) then
          call now(time_end) 
           write(*, '(a, i18, "/", i18, a, f10.2, "s")') 'ik/knv3', &
@@ -373,7 +373,7 @@ program hao_edgestates
                 enddo 
             enddo
         ! if(irank.eq.0)then
-        ! write(*,*) "fourHam", fourHamilton
+         write(*,*) "fourHam no problem irank=",irank
         ! endif
         hamiltonian=cmplx(0d0,0d0)
         do i=1,Hdim
@@ -386,17 +386,17 @@ program hao_edgestates
                 endif
             enddo
         enddo
-        if(irank.eq.1)then    
-        write(*,*) "Ham",hamiltonian(:,:)
-        endif   
+  
+        write(*,*) "Ham no problem, irank =" ,irank
+
       
      call zheevx('V','A','U',Hdim,hamiltonian,Hdim,vl,vu,1,Hdim,abstol,ne,eigvals,eigvecs,Hdim,work,lwork,rwork,iwork, ifail,info)
        !对角化这个超胞哈密顿量
-     
-       do ib=1,Hdim
-       write(*,*) "eigvals_per_k(ik,1)",eigvals(1)
+     write(*,*) "zheevx no problem, irank =" ,irank
+    !    do ib=1,Hdim
+    !    write(*,*) "eigvals_per_k(ik,1)",eigvals(1)
             eigvals_per_k(ik,:) = eigvals(:)
-       enddo
+    !    enddo
  !    call mpi_barrier(mpi_comm_world,ierr)
  !   if (irank /= 0) then
  !       call MPI_Send(eigvals(:), Hdim, MPI_DOUBLE_COMPLEX, 0, irank, MPI_COMM_WORLD, ierr)
