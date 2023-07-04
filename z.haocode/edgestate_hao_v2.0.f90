@@ -455,12 +455,14 @@ program hao_edgestates
             write(*,*) "before  fourHam irank=",irank
             do ii=1,rvecnum   
                 do i=1,num_wann
-                    write(*,*) i
+                    write(*,*) "i=",i
                     do j=1,num_wann
-                        write(*,*) j
+                        write(*,*) "j=",j
                         phase=0d0
+                        write(*,*) "phase=",phase
                         do i1=1,fourdim
-                            write(*,*) ii,i,j,fourdir(i1)
+                            write(*,*) "fourdim=",fourdim
+                            ! write(*,*) ii,i,j,fourdir(i1)
                             fourdirection=fourdir(i1)
                             phase=phase+(irvec(fourdirection,ii))*k(ik)
                         enddo
