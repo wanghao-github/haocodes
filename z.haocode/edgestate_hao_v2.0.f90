@@ -17,7 +17,7 @@ program hao_edgestates
     integer,allocatable  :: excludeup(:),excludedown(:),temp(:),wannierfunctioninHam(:)
     integer              :: ndiffatom,nexcludeup,nexcludedown,return_num_wann,locmin,locmax,i1,i2
     real                 :: vl,vu,abstol,ik1,time_start,time_end
-    integer              :: length,length1,length2,length3,length4
+    integer              :: length,length1,length2,length3,length4,length5
     real,allocatable     :: eigvals(:),eigvals_per_k(:,:)
     complex,allocatable  :: eigvecs(:,:)
     integer              :: ne,info,lwork,ik_cpu
@@ -84,6 +84,9 @@ program hao_edgestates
 
     call mpi_bcast(num_wann,1,MPI_INTEGER,0,mpi_comm_world,ierr)
     call mpi_bcast(rvecnum,1,MPI_INTEGER,0,mpi_comm_world,ierr)
+    call mpi_bcast(numkpts,1,MPI_INTEGER,0,mpi_comm_world,ierr)
+
+
     if(.not.allocated(hops)) then 
         allocate(hops(num_wann,num_wann,rvecnum))
     endif 
@@ -166,6 +169,8 @@ program hao_edgestates
     endif
 
     call mpi_bcast(nrpts,rvecnum,MPI_INTEGER,0,mpi_comm_world,ierr)
+    call mpi_bcast(numberlayer,1,MPI_INTEGER,0,mpi_comm_world,ierr)
+    call mpi_bcast(ndiffatom,1,MPI_INTEGER,0,mpi_comm_world,ierr)
 
     if(irank.eq.0)then
         write(*,*) "irank=", irank
@@ -262,62 +267,74 @@ program hao_edgestates
 
     endif
 
+    if (irank.eq.0) then    
+        write(*,*)"here is no problem2"
+      endif
+
+    call mpi_bcast(layerspreadmin,1,MPI_INTEGER,0,mpi_comm_world,ierr)
+    call mpi_bcast(layerspreadmax,1,MPI_INTEGER,0,mpi_comm_world,ierr)
+    call mpi_bcast(layerspread,1,MPI_INTEGER,0,mpi_comm_world,ierr)
+    call mpi_bcast(locmax,1,MPI_INTEGER,0,mpi_comm_world,ierr)
+    call mpi_bcast(locmin,1,MPI_INTEGER,0,mpi_comm_world,ierr)
+
     if (irank.eq.0) then
         write(*,*)"layerspreadmin",layerspreadmin
         write(*,*)"layerspreadmax",layerspreadmax
         write(*,*)"here is no problem"
     endif
+
+
+    call mpi_bcast(Hdim,1,MPI_INTEGER,0,mpi_comm_world,ierr)
+    call mpi_bcast(return_num_wann,1,MPI_INTEGER,0,mpi_comm_world,ierr)
+
+
     allocate(eigvals_per_k(numkpts,Hdim))
+    length5 = numkpts*Hdim
+    call mpi_bcast(eigvals_per_k,length5,MPI_DOUBLE_PRECISION,0,mpi_comm_world,ierr)   
     eigvals_per_k=0.0
    
     if (irank.eq.0) then
         write(*,*)"here is no problem1"
     endif
 
-    call mpi_bcast(numberlayer,1,MPI_INTEGER,0,mpi_comm_world,ierr)
-    call mpi_bcast(return_num_wann,1,MPI_INTEGER,0,mpi_comm_world,ierr)
-    call mpi_bcast(Hdim,1,MPI_INTEGER,0,mpi_comm_world,ierr)
+    
+    
+    
     ! call mpi_bcast(nexcludeup,size(nexcludeup),MPI_INTEGER,0,mpi_comm_world,ierr)
     ! call mpi_bcast(nexcludedown,size(nexcludedown),MPI_INTEGER,0,mpi_comm_world,ierr)
     ! call mpi_bcast(nwannexup,1,MPI_INTEGER,0,mpi_comm_world,ierr)
     ! call mpi_bcast(nwannexdown,1,MPI_INTEGER,0,mpi_comm_world,ierr)
-    call mpi_bcast(layerspreadmin,1,MPI_INTEGER,0,mpi_comm_world,ierr)
-    call mpi_bcast(layerspreadmax,1,MPI_INTEGER,0,mpi_comm_world,ierr)
-    call mpi_bcast(layerspread,1,MPI_INTEGER,0,mpi_comm_world,ierr)
-    call mpi_bcast(locmax,1,MPI_INTEGER,0,mpi_comm_world,ierr)
-    call mpi_bcast(locmin,1,MPI_INTEGER,0,mpi_comm_world,ierr)
-    call mpi_bcast(ndiffatom,1,MPI_INTEGER,0,mpi_comm_world,ierr)
+
     
-    if (irank.eq.0) then    
-      write(*,*)"here is no problem2"
-    endif
     
-    if(.not.allocated(atomarr))then 
-        allocate(atomarr(ndiffatom))
-    endif
-    call mpi_bcast(atomarr,ndiffatom,MPI_INTEGER,0,mpi_comm_world,ierr)
 
-    if (irank.eq.0) then    
-        write(*,*)"here is no problem3"
-      endif
+    
+    ! if(.not.allocated(atomarr))then 
+    !     allocate(atomarr(ndiffatom))
+    ! endif
+    ! call mpi_bcast(atomarr,ndiffatom,MPI_INTEGER,0,mpi_comm_world,ierr)
 
-    if(.not.allocated(excludeup))then 
-        allocate(excludeup(nexcludeup))
-    endif
-    call mpi_bcast(excludeup,nexcludeup,MPI_INTEGER,0,mpi_comm_world,ierr)
+    ! if (irank.eq.0) then    
+    !     write(*,*)"here is no problem3"
+    !   endif
 
-    if (irank.eq.0) then    
-        write(*,*)"here is no problem4"
-      endif
+    ! if(.not.allocated(excludeup))then 
+    !     allocate(excludeup(nexcludeup))
+    ! endif
+    ! call mpi_bcast(excludeup,nexcludeup,MPI_INTEGER,0,mpi_comm_world,ierr)
 
-    if(.not.allocated(excludedown))then 
-        allocate(excludedown(nexcludedown))
-    endif
-    call mpi_bcast(excludedown,nexcludedown,MPI_INTEGER,0,mpi_comm_world,ierr)
+    ! if (irank.eq.0) then    
+    !     write(*,*)"here is no problem4"
+    !   endif
 
-    if (irank.eq.0) then    
-        write(*,*)"here is no problem5"
-      endif
+    ! if(.not.allocated(excludedown))then 
+    !     allocate(excludedown(nexcludedown))
+    ! endif
+    ! call mpi_bcast(excludedown,nexcludedown,MPI_INTEGER,0,mpi_comm_world,ierr)
+
+    ! if (irank.eq.0) then    
+    !     write(*,*)"here is no problem5"
+    !   endif
 
     if(.not.allocated(layerintarr))then 
         allocate(layerintarr(Hdim))
@@ -343,14 +360,20 @@ program hao_edgestates
           endif
 
         allocate(fourHamilton(layerspreadmin:layerspreadmax,num_wann,num_wann))
+        length = layerspread*num_wann*num_wann
+        call mpi_bcast(fourHamilton,length,MPI_DOUBLE_PRECISION,0,mpi_comm_world,ierr)
+
         allocate(hamiltonian(Hdim,Hdim))
+        length3 = Hdim*Hdim
+        call mpi_bcast(hamiltonian,length3,MPI_DOUBLE_PRECISION,0,mpi_comm_world,ierr)
+
 
         if (irank.eq.0) then    
             write(*,*)"here is no problem8"
           endif
 
         call mpi_bcast(fourdim,1,MPI_INTEGER,0,mpi_comm_world,ierr)
-        call mpi_bcast(numkpts,1,MPI_INTEGER,0,mpi_comm_world,ierr)
+        
 
         length4 = fourdim
         call mpi_bcast(fourdir,length4,MPI_INTEGER,0,mpi_comm_world,ierr)
@@ -358,15 +381,13 @@ program hao_edgestates
             write(*,*)"here is no problem9"
           endif
         
-        length = layerspread*num_wann*num_wann
-        call mpi_bcast(fourHamilton,length,MPI_DOUBLE_PRECISION,0,mpi_comm_world,ierr)
+
   
         if (irank.eq.0) then    
             write(*,*)"here is no problem10"
         endif   
           
-        length3 = Hdim*Hdim
-        call mpi_bcast(hamiltonian,length3,MPI_DOUBLE_PRECISION,0,mpi_comm_world,ierr)
+
         
         if (irank.eq.0) then    
             write(*,*)"here is no problem11"
@@ -388,7 +409,6 @@ program hao_edgestates
     call mpi_bcast(k,length2,MPI_DOUBLE_PRECISION,0,mpi_comm_world,ierr)    
     ! write(*,*)"noproblem_here3" ,irank  
     ik_cpu = 0
-    eigvals_per_k(:,:)=0
     ! do ik=1,numkpts
   !  do ik= 1, 10
          !write(*,*) "mod(ik-1,isize)", mod(ik-1,isize)
