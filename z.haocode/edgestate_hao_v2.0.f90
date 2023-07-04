@@ -171,6 +171,8 @@ program hao_edgestates
     call mpi_bcast(nrpts,rvecnum,MPI_INTEGER,0,mpi_comm_world,ierr)
     call mpi_bcast(numberlayer,1,MPI_INTEGER,0,mpi_comm_world,ierr)
     call mpi_bcast(ndiffatom,1,MPI_INTEGER,0,mpi_comm_world,ierr)
+    call mpi_bcast(fourdim,1,MPI_INTEGER,0,mpi_comm_world,ierr)
+    call mpi_bcast(fourdir,fourdim,MPI_INTEGER,0,mpi_comm_world,ierr)
 
     if(irank.eq.0)then
         write(*,*) "irank=", irank
@@ -371,27 +373,7 @@ program hao_edgestates
         if (irank.eq.0) then    
             write(*,*)"here is no problem8"
           endif
-
-        call mpi_bcast(fourdim,1,MPI_INTEGER,0,mpi_comm_world,ierr)
         
-
-        length4 = fourdim
-        call mpi_bcast(fourdir,length4,MPI_INTEGER,0,mpi_comm_world,ierr)
-        if (irank.eq.0) then    
-            write(*,*)"here is no problem9"
-          endif
-        
-
-  
-        if (irank.eq.0) then    
-            write(*,*)"here is no problem10"
-        endif   
-          
-
-        
-        if (irank.eq.0) then    
-            write(*,*)"here is no problem11"
-        endif
 
         call mpi_bcast(wannierfunctioninham,Hdim,MPI_INTEGER,0,mpi_comm_world,ierr)
   
@@ -405,8 +387,7 @@ program hao_edgestates
         enddo
     endif
 
-    length2 = numkpts
-    call mpi_bcast(k,length2,MPI_DOUBLE_PRECISION,0,mpi_comm_world,ierr)    
+    call mpi_bcast(k,numkpts,MPI_DOUBLE_PRECISION,0,mpi_comm_world,ierr)    
     ! write(*,*)"noproblem_here3" ,irank  
     ik_cpu = 0
     ! do ik=1,numkpts
