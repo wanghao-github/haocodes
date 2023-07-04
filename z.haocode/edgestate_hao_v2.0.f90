@@ -327,8 +327,8 @@ program hao_edgestates
         call mpi_bcast(fourdir,size(fourdir),MPI_INTEGER,0,mpi_comm_world,ierr)
         call mpi_bcast(fourdim,1,MPI_INTEGER,0,mpi_comm_world,ierr)
         call mpi_bcast(numkpts,1,MPI_INTEGER,0,mpi_comm_world,ierr)
- !       call mpi_bcast(fourHamilton,size(fourHamilton),MPI_DOUBLE_PRECISION,0,mpi_comm_world,ierr)
- !       call mpi_bcast(hamiltonian,size(hamiltonian),MPI_DOUBLE_PRECISION,0,mpi_comm_world,ierr)
+        call mpi_bcast(fourHamilton,size(fourHamilton),MPI_DOUBLE_PRECISION,0,mpi_comm_world,ierr)
+        call mpi_bcast(hamiltonian,size(hamiltonian),MPI_DOUBLE_PRECISION,0,mpi_comm_world,ierr)
         call mpi_bcast(wannierfunctioninham,size(wannierfunctioninham),MPI_INTEGER,0,mpi_comm_world,ierr)
     if(irank.eq.0)then 
         do ik=1,numkpts
