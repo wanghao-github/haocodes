@@ -166,13 +166,16 @@ program hao_edgestates
         read(400,'(<mod(rvecnum,15)>I5)') (nrpts(15*(rvecnum/15)+i),i=1,mod(rvecnum,15))
         close(400)
     write(*,*) "nrpts_ok"
+
+    write(*,*) "fourdim" ,fourdim
+    write(*,*) "fourdir" ,fourdir
     endif
 
     call mpi_bcast(nrpts,rvecnum,MPI_INTEGER,0,mpi_comm_world,ierr)
     call mpi_bcast(numberlayer,1,MPI_INTEGER,0,mpi_comm_world,ierr)
     call mpi_bcast(ndiffatom,1,MPI_INTEGER,0,mpi_comm_world,ierr)
-    call mpi_bcast(fourdim,1,MPI_INTEGER,0,mpi_comm_world,ierr)
-    call mpi_bcast(fourdir,fourdim,MPI_INTEGER,0,mpi_comm_world,ierr)
+    ! call mpi_bcast(fourdim,1,MPI_INTEGER,0,mpi_comm_world,ierr)
+    ! call mpi_bcast(fourdir,fourdim,MPI_INTEGER,0,mpi_comm_world,ierr)
 
     if(irank.eq.0)then
         write(*,*) "irank=", irank
