@@ -155,6 +155,7 @@ program hao_edgestates
         read(100,'(I3,<fourdim>I3)')            layerdir,fourdir(:) 
         close(100)
         write(*,*) "input_read OK"
+        write(*,*) "fourdir" , fourdir
     endif
 
     allocate(nrpts(rvecnum))
