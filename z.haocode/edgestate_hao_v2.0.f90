@@ -453,6 +453,7 @@ program hao_edgestates
         endif
             fourHamilton=0d0
             write(*,*) "before  fourHam irank=",irank
+            write(*,*) "num_wann=",num_wann,"rvecnum =",rvecnum
             do ii=1,rvecnum   
                 do i=1,num_wann
                     write(*,*) "i=",i
@@ -460,14 +461,14 @@ program hao_edgestates
                         write(*,*) "j=",j
                         phase=0d0
                         write(*,*) "phase=",phase
-                        do i1=1,fourdim
-                            write(*,*) "fourdim=",fourdim
-                            ! write(*,*) ii,i,j,fourdir(i1)
-                            fourdirection=fourdir(i1)
-                            phase=phase+(irvec(fourdirection,ii))*k(ik)
-                        enddo
-                        fac=cmplx(cos(phase),sin(phase))                    ! (原始的单胞Hr只在fourdir上做傅里叶变换)
-                        fourHamilton(irvec(layerdir,ii),i,j)=fourHamilton(irvec(layerdir,ii),i,j)+fac*hops(i,j,ii)/nrpts(ii)
+                        ! do i1=1,fourdim
+                        !     write(*,*) "fourdim=",fourdim
+                        !     ! write(*,*) ii,i,j,fourdir(i1)
+                        !     fourdirection=fourdir(i1)
+                        !     phase=phase+(irvec(fourdirection,ii))*k(ik)
+                        ! enddo
+                        ! fac=cmplx(cos(phase),sin(phase))                    ! (原始的单胞Hr只在fourdir上做傅里叶变换)
+                        ! fourHamilton(irvec(layerdir,ii),i,j)=fourHamilton(irvec(layerdir,ii),i,j)+fac*hops(i,j,ii)/nrpts(ii)
                     enddo       
                 enddo 
             enddo
