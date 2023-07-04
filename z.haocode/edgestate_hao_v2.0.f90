@@ -401,26 +401,26 @@ program hao_edgestates
             write(*,*)"here is no problem7"
           endif
 
-        allocate(fourHamilton(layerspreadmin:layerspreadmax,num_wann,num_wann))
-        length = layerspread*num_wann*num_wann
-        call mpi_bcast(fourHamilton,length,MPI_DOUBLE_PRECISION,0,mpi_comm_world,ierr)
+        ! allocate(fourHamilton(layerspreadmin:layerspreadmax,num_wann,num_wann))
+        ! length = layerspread*num_wann*num_wann
+        ! call mpi_bcast(fourHamilton,length,MPI_DOUBLE_PRECISION,0,mpi_comm_world,ierr)
 
-        allocate(hamiltonian(Hdim,Hdim))
-        length3 = Hdim*Hdim
-        call mpi_bcast(hamiltonian,length3,MPI_DOUBLE_PRECISION,0,mpi_comm_world,ierr)
+        ! allocate(hamiltonian(Hdim,Hdim))
+        ! length3 = Hdim*Hdim
+        ! call mpi_bcast(hamiltonian,length3,MPI_DOUBLE_PRECISION,0,mpi_comm_world,ierr)
 
 
-        if (irank.eq.0) then    
-            write(*,*)"here is no problem8"
-            write(*,*),wannierfunctioninham
-          endif
+        ! if (irank.eq.0) then    
+        !     write(*,*)"here is no problem8"
+        !     write(*,*),wannierfunctioninham
+        !   endif
         
 
         ! call mpi_bcast(wannierfunctioninham,Hdim,MPI_INTEGER,0,mpi_comm_world,ierr)
   
-        if (irank.eq.0) then    
-            write(*,*)"here is no problem12"
-        endif
+        ! if (irank.eq.0) then    
+        !     write(*,*)"here is no problem12"
+        ! endif
   
         if(irank.eq.0)then 
         do ik=1,numkpts
