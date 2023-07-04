@@ -169,6 +169,7 @@ program hao_edgestates
 
     write(*,*) "fourdim" ,fourdim
     write(*,*) "fourdir" ,fourdir
+    write(*,*) "layerdir" ,layerdir
     endif
 
     call mpi_bcast(nrpts,rvecnum,MPI_INTEGER,0,mpi_comm_world,ierr)
@@ -375,10 +376,11 @@ program hao_edgestates
 
         if (irank.eq.0) then    
             write(*,*)"here is no problem8"
+            write(*,*),wannierfunctioninham
           endif
         
 
-        call mpi_bcast(wannierfunctioninham,Hdim,MPI_INTEGER,0,mpi_comm_world,ierr)
+        ! call mpi_bcast(wannierfunctioninham,Hdim,MPI_INTEGER,0,mpi_comm_world,ierr)
   
         if (irank.eq.0) then    
             write(*,*)"here is no problem12"
