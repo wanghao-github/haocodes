@@ -335,7 +335,7 @@ program hao_edgestates
         enddo
     endif
     call mpi_bcast(k,numkpts,MPI_DOUBLE_PRECISION,0,mpi_comm_world,ierr)    
-    write(*,*)"noproblem_here3"   
+    write(*,*)"noproblem_here3" ,irank  
     ik_cpu = 0
     eigvals_per_k(:,:)=0
     do ik=1,numkpts
