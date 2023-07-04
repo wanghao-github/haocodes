@@ -349,11 +349,9 @@ program hao_edgestates
             write(*,*)"here is no problem8"
           endif
 
-        call mpi_bcast(fourdirection,1,MPI_INTEGER,0,mpi_comm_world,ierr)
-        call mpi_bcast(fourdir,size(fourdir),MPI_INTEGER,0,mpi_comm_world,ierr)
         call mpi_bcast(fourdim,1,MPI_INTEGER,0,mpi_comm_world,ierr)
         call mpi_bcast(numkpts,1,MPI_INTEGER,0,mpi_comm_world,ierr)
-        
+        call mpi_bcast(fourdir,fourdim,MPI_INTEGER,0,mpi_comm_world,ierr)
         if (irank.eq.0) then    
             write(*,*)"here is no problem9"
           endif
@@ -363,15 +361,16 @@ program hao_edgestates
   
         if (irank.eq.0) then    
             write(*,*)"here is no problem10"
-        endif      
+        endif   
           
-        call mpi_bcast(hamiltonian,size(hamiltonian),MPI_DOUBLE_PRECISION,0,mpi_comm_world,ierr)
+        length3 = Hdim*Hdim
+        call mpi_bcast(hamiltonian,length3,MPI_DOUBLE_PRECISION,0,mpi_comm_world,ierr)
         
         if (irank.eq.0) then    
             write(*,*)"here is no problem11"
         endif
 
-        call mpi_bcast(wannierfunctioninham,size(wannierfunctioninham),MPI_INTEGER,0,mpi_comm_world,ierr)
+        call mpi_bcast(wannierfunctioninham,Hdim,MPI_INTEGER,0,mpi_comm_world,ierr)
   
         if (irank.eq.0) then    
             write(*,*)"here is no problem12"
