@@ -300,7 +300,7 @@ program hao_edgestates
     write(*,*)"here is no problem2132131"
 
     allocate(eigvals_per_k(numkpts,Hdim))
-    call mpi_bcast(eigvals_per_k,size(eigvals_per_k),MPI_DOUBLE_PRECISION,0,mpi_comm_world,ierr)   
+    ! call mpi_bcast(eigvals_per_k,size(eigvals_per_k),MPI_DOUBLE_PRECISION,0,mpi_comm_world,ierr)   
     eigvals_per_k=0.0
    
     if (irank.eq.0) then
