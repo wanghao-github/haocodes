@@ -43,7 +43,7 @@ program hao_edgestates
     abstol=2.0*tiny(abstol)
     pi = 3.14159265
     numkpts = 128
-
+ 
     if(irank.eq.0)then
         write(*,*) "isize=", isize
         open(200,file='hopping.1')
@@ -92,7 +92,7 @@ program hao_edgestates
     endif 
     length1=num_wann*num_wann*rvecnum
     call mpi_bcast(hops,length1,MPI_DOUBLE_COMPLEX,0,mpi_comm_world,ierr)
-
+    write(*,*) irank
     if(irank == 0)then
         write(*,*) "irank=", irank
         open(100,file='layer_inp')
