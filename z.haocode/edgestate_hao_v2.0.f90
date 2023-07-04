@@ -299,20 +299,33 @@ program hao_edgestates
     call mpi_bcast(return_num_wann,1,MPI_INTEGER,0,mpi_comm_world,ierr)
     write(*,*)"here is no problem2132131"
 
-
-
-
-! 发送Hdim的值
-    call MPI_Isend(Hdim, 1, MPI_INTEGER, 0, 0, mpi_comm_world, request, ierr)
-
-    ! 接收Hdim的值
-    call MPI_Irecv(Hdim, 1, MPI_INTEGER, 0, 0, mpi_comm_world, request, ierr)
+! 进程0发送Hdim的值给其他进程
+    if (irank == 0) then
+        do i = 1, isize-1
+            call MPI_Send(Hdim, 1, MPI_INTEGER, i, 0, mpi_comm_world, ierr)
+        end do
+    else
+        call MPI_Recv(Hdim, 1, MPI_INTEGER, 0, 0, mpi_comm_world, status, ierr)
+    end if
     
-    ! 等待通信完成
-    call MPI_Wait(request, status, ierr)
+    ! 所有进程在此处等待，直到所有进程都接收到了Hdim的值
+    call MPI_Barrier(mpi_comm_world, ierr)
     
     ! 广播layerintarr的内容
-    call MPI_Bcast(layerintarr, Hdim, MPI_INTEGER, 0, mpi_comm_world, ierr)
+    call MPI_Bcast(layerintarr, Hdim, MPI_INTEGER, 0, mpi_comm_world, ierr)    
+
+
+! ! 发送Hdim的值
+!     call MPI_Isend(Hdim, 1, MPI_INTEGER, 0, 0, mpi_comm_world, request, ierr)
+
+!     ! 接收Hdim的值
+!     call MPI_Irecv(Hdim, 1, MPI_INTEGER, 0, 0, mpi_comm_world, request, ierr)
+    
+!     ! 等待通信完成
+!     call MPI_Wait(request, status, ierr)
+    
+!     ! 广播layerintarr的内容
+!     call MPI_Bcast(layerintarr, Hdim, MPI_INTEGER, 0, mpi_comm_world, ierr)
     
 
     allocate(eigvals_per_k(numkpts,Hdim))
