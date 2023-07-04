@@ -421,16 +421,16 @@ program hao_edgestates
         ! if (irank.eq.0) then    
         !     write(*,*)"here is no problem12"
         ! endif
-  
-        if(irank.eq.0)then 
+          call mpi_barrier(mpi_comm_world,ierr)
+        ! if(irank.eq.0)then 
         do ik=1,numkpts
             k(ik) = ik*3*pi/numkpts
         enddo
-    endif
+    ! endif
 
-    call mpi_bcast(k,numkpts,MPI_DOUBLE_PRECISION,0,mpi_comm_world,ierr)    
+    ! call mpi_bcast(k,numkpts,MPI_DOUBLE_PRECISION,0,mpi_comm_world,ierr)    
     ! write(*,*)"noproblem_here3" ,irank  
-    ik_cpu = 0
+    ! ik_cpu = 0
     ! do ik=1,numkpts
   !  do ik= 1, 10
          !write(*,*) "mod(ik-1,isize)", mod(ik-1,isize)
