@@ -287,7 +287,7 @@ program hao_edgestates
     call mpi_bcast(layerspread,1,MPI_INTEGER,0,mpi_comm_world,ierr)
     call mpi_bcast(locmax,1,MPI_INTEGER,0,mpi_comm_world,ierr)
     call mpi_bcast(locmin,1,MPI_INTEGER,0,mpi_comm_world,ierr)
-
+    
     if (irank.eq.0) then
         write(*,*)"layerspreadmin",layerspreadmin
         write(*,*)"layerspreadmax",layerspreadmax
@@ -307,6 +307,8 @@ program hao_edgestates
         write(*,*)"here is no problem1"
     endif
 
+    call mpi_barrier(mpi_comm_world,ierr)
+    call mpi_bcast(layerintarr,Hdim,MPI_INTEGER,0,mpi_comm_world,ierr)
     
     
     
@@ -346,10 +348,10 @@ program hao_edgestates
     !     write(*,*)"here is no problem5"
     !   endif
 
-    if(.not.allocated(layerintarr))then 
-        allocate(layerintarr(Hdim))
-    endif
-    call mpi_bcast(layerintarr,Hdim,MPI_INTEGER,0,mpi_comm_world,ierr)
+    ! if(.not.allocated(layerintarr))then 
+    !     allocate(layerintarr(Hdim))
+    ! endif
+    
 
     if (irank.eq.0) then    
         write(*,*)"here is no problem6"
