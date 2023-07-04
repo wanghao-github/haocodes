@@ -263,6 +263,8 @@ program hao_edgestates
     endif
 
     if (irank.eq.0) then
+        write(*,*)"layerspreadmin",layerspreadmin
+        write(*,*)"layerspreadmax",layerspreadmax
         write(*,*)"here is no problem"
     endif
     allocate(eigvals_per_k(numkpts,Hdim))
