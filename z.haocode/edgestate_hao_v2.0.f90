@@ -326,9 +326,9 @@ program hao_edgestates
         call mpi_bcast(fourdirection,1,MPI_INTEGER,0,mpi_comm_world,ierr)
         call mpi_bcast(fourdim,1,MPI_INTEGER,0,mpi_comm_world,ierr)
         call mpi_bcast(numkpts,1,MPI_INTEGER,0,mpi_comm_world,ierr)
-      !  call mpi_bcast(fourHamilton,size(fourHamilton),MPI_DOUBLE_PRECISION,0,mpi_comm_world,ierr)
-      !  call mpi_bcast(hamiltonian,size(hamiltonian),MPI_DOUBLE_PRECISION,0,mpi_comm_world,ierr)
-      !  call mpi_bcast(wannierfunctioninham,size(wannierfunctioninham),MPI_DOUBLE_PRECISION,0,mpi_comm_world,ierr)
+        call mpi_bcast(fourHamilton,size(fourHamilton),MPI_DOUBLE_PRECISION,0,mpi_comm_world,ierr)
+        call mpi_bcast(hamiltonian,size(hamiltonian),MPI_DOUBLE_PRECISION,0,mpi_comm_world,ierr)
+        call mpi_bcast(wannierfunctioninham,size(wannierfunctioninham),MPI_INTEGER,0,mpi_comm_world,ierr)
     if(irank.eq.0)then 
         do ik=1,numkpts
             k(ik) = ik*3*pi/numkpts
@@ -346,7 +346,7 @@ program hao_edgestates
        ik_cpu=ik_cpu+1
      !   call MPI_Barrier(MPI_COMM_WORLD, ierr)
      !  write(*,*) "beforeik", ik, "beforeikcpu", ik_cpu,"irank",irank
- !       if (mod(ik_cpu-1,isize) /= irank) cycle
+        if (mod(ik_cpu-1,isize) /= irank) cycle
  !           write(*,*) "hello"
             !eigvals_per_k(ik,:)=0
             fourHamilton=0d0
