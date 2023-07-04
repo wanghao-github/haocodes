@@ -295,7 +295,7 @@ program hao_edgestates
     endif
 
 
-    call mpi_bcast(Hdim,1,MPI_INTEGER,0,mpi_comm_world,ierr)
+    ! call mpi_bcast(Hdim,1,MPI_INTEGER,0,mpi_comm_world,ierr)
     call mpi_bcast(return_num_wann,1,MPI_INTEGER,0,mpi_comm_world,ierr)
     write(*,*)"here is no problem2132131"
 
@@ -307,7 +307,23 @@ program hao_edgestates
         write(*,*)"here is no problem1"
     endif
 
-    call mpi_bcast(layerintarr,size(layerintarr),MPI_INTEGER,0,mpi_comm_world,ierr)
+
+! 发送Hdim的值
+    call MPI_Isend(Hdim, 1, MPI_INTEGER, 0, 0, mpi_comm_world, request, ierr)
+
+    ! 接收Hdim的值
+    call MPI_Irecv(Hdim, 1, MPI_INTEGER, 0, 0, mpi_comm_world, request, ierr)
+    
+    ! 等待通信完成
+    call MPI_Wait(request, status, ierr)
+    
+    ! 广播layerintarr的内容
+    call MPI_Bcast(layerintarr, Hdim, MPI_INTEGER, 0, mpi_comm_world, ierr)
+    
+
+
+
+    ! call mpi_bcast(layerintarr,Hdim,MPI_INTEGER,0,mpi_comm_world,ierr)
     
     
     
