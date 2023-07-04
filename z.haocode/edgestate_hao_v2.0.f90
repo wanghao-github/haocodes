@@ -10,7 +10,7 @@ program hao_edgestates
     integer,allocatable  :: nrpts(:),irvec(:,:)
     complex,allocatable  :: hops(:,:,:),ham(:,:),fourHamilton(:,:,:),hamiltonian(:,:)
     real,allocatable     :: k(:),localisationpar(:)
-    integer              :: num_lines,num_wann,i,j,ierr,irank,status,isize,ik,numkpts,fourdim,fourdirection
+    integer              :: num_lines,num_wann,i,j,ierr,irank,status,request,isize,ik,numkpts,fourdim,fourdirection
     integer              :: Hdim,numberlayer,layerspreadmax,layerspreadmin,layerspread,layerdir
     complex              :: fac
     integer,allocatable  :: wannperat(:),atomnumberarray(:),fourdir(:),layerintarr(:)
