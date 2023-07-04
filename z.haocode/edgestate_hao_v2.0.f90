@@ -167,8 +167,8 @@ program hao_edgestates
 
     call mpi_bcast(nrpts,rvecnum,MPI_INTEGER,0,mpi_comm_world,ierr)
 
-   ! if(irank.eq.0)then
-    !    write(*,*) "irank=", irank
+    if(irank.eq.0)then
+        write(*,*) "irank=", irank
         return_num_wann=num_wann*numberlayer
         nwannexup=0
         do i=1,nexcludeup
@@ -260,7 +260,7 @@ program hao_edgestates
         enddo
         layerspread=layerspreadmax-layerspreadmin                   !获得原Hr在这个方向上的差值
 
-    !endif
+    endif
 
     if (irank.eq.0) then
         write(*,*)"here is no problem"
@@ -272,19 +272,19 @@ program hao_edgestates
         write(*,*)"here is no problem1"
     endif
 
-    !call mpi_bcast(numberlayer,1,MPI_INTEGER,0,mpi_comm_world,ierr)
-    !call mpi_bcast(return_num_wann,1,MPI_INTEGER,0,mpi_comm_world,ierr)
-    !call mpi_bcast(Hdim,1,MPI_INTEGER,0,mpi_comm_world,ierr)
-    !call mpi_bcast(nexcludeup,1,MPI_INTEGER,0,mpi_comm_world,ierr)
-    !call mpi_bcast(nexcludedown,1,MPI_INTEGER,0,mpi_comm_world,ierr)
-    !call mpi_bcast(nwannexup,1,MPI_INTEGER,0,mpi_comm_world,ierr)
-    !call mpi_bcast(nwannexdown,1,MPI_INTEGER,0,mpi_comm_world,ierr)
-    !call mpi_bcast(layerspreadmin,1,MPI_INTEGER,0,mpi_comm_world,ierr)
-    !call mpi_bcast(layerspreadmax,1,MPI_INTEGER,0,mpi_comm_world,ierr)
-    !call mpi_bcast(layerspread,1,MPI_INTEGER,0,mpi_comm_world,ierr)
-    !call mpi_bcast(locmax,1,MPI_INTEGER,0,mpi_comm_world,ierr)
-    !call mpi_bcast(locmin,1,MPI_INTEGER,0,mpi_comm_world,ierr)
-    !call mpi_bcast(ndiffatom,1,MPI_INTEGER,0,mpi_comm_world,ierr)
+    call mpi_bcast(numberlayer,1,MPI_INTEGER,0,mpi_comm_world,ierr)
+    call mpi_bcast(return_num_wann,1,MPI_INTEGER,0,mpi_comm_world,ierr)
+    call mpi_bcast(Hdim,1,MPI_INTEGER,0,mpi_comm_world,ierr)
+    call mpi_bcast(nexcludeup,1,MPI_INTEGER,0,mpi_comm_world,ierr)
+    call mpi_bcast(nexcludedown,1,MPI_INTEGER,0,mpi_comm_world,ierr)
+    call mpi_bcast(nwannexup,1,MPI_INTEGER,0,mpi_comm_world,ierr)
+    call mpi_bcast(nwannexdown,1,MPI_INTEGER,0,mpi_comm_world,ierr)
+    call mpi_bcast(layerspreadmin,1,MPI_INTEGER,0,mpi_comm_world,ierr)
+    call mpi_bcast(layerspreadmax,1,MPI_INTEGER,0,mpi_comm_world,ierr)
+    call mpi_bcast(layerspread,1,MPI_INTEGER,0,mpi_comm_world,ierr)
+    call mpi_bcast(locmax,1,MPI_INTEGER,0,mpi_comm_world,ierr)
+    call mpi_bcast(locmin,1,MPI_INTEGER,0,mpi_comm_world,ierr)
+    call mpi_bcast(ndiffatom,1,MPI_INTEGER,0,mpi_comm_world,ierr)
     
     if (irank.eq.0) then    
       write(*,*)"here is no problem2"
@@ -333,7 +333,7 @@ program hao_edgestates
         enddo
     endif
     call mpi_bcast(k,numkpts,MPI_DOUBLE_PRECISION,0,mpi_comm_world,ierr)    
-    write(*,*)"noproblem_here"   
+    write(*,*)"noproblem_here3"   
     ik_cpu = 0
     eigvals_per_k(:,:)=0
     do ik=1,numkpts
