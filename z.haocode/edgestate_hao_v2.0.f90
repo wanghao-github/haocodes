@@ -181,12 +181,12 @@ program hao_edgestates
 
     call mpi_bcast(fourdim,1,MPI_INTEGER,0,mpi_comm_world,ierr)
     write(*,*) "fourdim=",fourdim,irank
-
-    call MPI_Barrier(mpi_comm_world, ierr)
     
     call mpi_bcast(fourdir,fourdim,MPI_INTEGER,0,mpi_comm_world,ierr)
     write(*,*) "fourdir=",fourdir,irank 
-    
+
+    call MPI_Barrier(mpi_comm_world, ierr)
+
     call mpi_bcast(layerdir,1,MPI_INTEGER,0,mpi_comm_world,ierr)
     write(*,*) "layerdir =",layerdir,irank 
 
