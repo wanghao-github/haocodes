@@ -154,9 +154,9 @@ program hao_edgestates
         allocate(fourdir(fourdim))
         read(100,'(I3,<fourdim>I3)')            layerdir,fourdir(:) 
         close(100)
-        deallocate(fourdir)
-        write(*,*) "input_read OK"
-        write(*,*) "fourdir" , fourdir
+        ! deallocate(fourdir)
+        ! write(*,*) "input_read OK"
+        ! write(*,*) "fourdir" , fourdir
     endif
 
     allocate(nrpts(rvecnum))
@@ -183,7 +183,7 @@ program hao_edgestates
     call mpi_bcast(fourdim,1,MPI_INTEGER,0,mpi_comm_world,ierr)
     write(*,*) "fourdim=",fourdim,irank
     
-    call mpi_bcast(fourdir,fourdim,MPI_INTEGER,0,mpi_comm_world,ierr)
+    call mpi_bcast(fourdir,1,MPI_INTEGER,0,mpi_comm_world,ierr)
     write(*,*) "fourdir=",fourdir,irank 
 
     call MPI_Barrier(mpi_comm_world, ierr)
