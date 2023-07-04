@@ -301,7 +301,9 @@ program hao_edgestates
 
 ! 进程0发送Hdim的值给其他进程
     if (irank == 0) then
+        write(*,*) "start send message"
         do i = 1, isize-1
+            write(*,*) "i = ",i
             call MPI_Send(Hdim, 1, MPI_INTEGER, i, 0, mpi_comm_world, ierr)
         end do
     else
