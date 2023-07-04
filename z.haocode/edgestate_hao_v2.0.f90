@@ -176,7 +176,7 @@ program hao_edgestates
     call mpi_bcast(numberlayer,1,MPI_INTEGER,0,mpi_comm_world,ierr)
     call mpi_bcast(ndiffatom,1,MPI_INTEGER,0,mpi_comm_world,ierr)
     call mpi_bcast(fourdim,1,MPI_INTEGER,0,mpi_comm_world,ierr)
-    call mpi_bcast(fourdir,1,MPI_INTEGER,0,mpi_comm_world,ierr)
+    call mpi_bcast(fourdir,fourdim,MPI_INTEGER,0,mpi_comm_world,ierr)
     call mpi_bcast(layerdir,1,MPI_INTEGER,0,mpi_comm_world,ierr)
 
     if(irank.eq.0)then
