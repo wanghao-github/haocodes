@@ -357,8 +357,9 @@ program hao_edgestates
         if (irank.eq.0) then    
             write(*,*)"here is no problem9"
           endif
-
-        call mpi_bcast(fourHamilton,size(fourHamilton),MPI_DOUBLE_PRECISION,0,mpi_comm_world,ierr)
+        
+        length = layerspread*num_wann*num_wann
+        call mpi_bcast(fourHamilton,length,MPI_DOUBLE_PRECISION,0,mpi_comm_world,ierr)
   
         if (irank.eq.0) then    
             write(*,*)"here is no problem10"
