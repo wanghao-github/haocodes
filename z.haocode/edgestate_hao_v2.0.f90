@@ -359,13 +359,22 @@ program hao_edgestates
           endif
 
         call mpi_bcast(fourHamilton,size(fourHamilton),MPI_DOUBLE_PRECISION,0,mpi_comm_world,ierr)
-        call mpi_bcast(hamiltonian,size(hamiltonian),MPI_DOUBLE_PRECISION,0,mpi_comm_world,ierr)
-        call mpi_bcast(wannierfunctioninham,size(wannierfunctioninham),MPI_INTEGER,0,mpi_comm_world,ierr)
-  
   
         if (irank.eq.0) then    
             write(*,*)"here is no problem10"
-          endif
+        endif      
+          
+        call mpi_bcast(hamiltonian,size(hamiltonian),MPI_DOUBLE_PRECISION,0,mpi_comm_world,ierr)
+        
+        if (irank.eq.0) then    
+            write(*,*)"here is no problem11"
+        endif
+
+        call mpi_bcast(wannierfunctioninham,size(wannierfunctioninham),MPI_INTEGER,0,mpi_comm_world,ierr)
+  
+        if (irank.eq.0) then    
+            write(*,*)"here is no problem12"
+        endif
   
         if(irank.eq.0)then 
         do ik=1,numkpts
