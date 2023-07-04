@@ -183,6 +183,9 @@ program hao_edgestates
     write(*,*) "hsdasdasdasd" 
     call mpi_bcast(layerdir,1,MPI_INTEGER,0,mpi_comm_world,ierr)
     write(*,*) "hqqqqqqqqqq" 
+
+    call MPI_Barrier(mpi_comm_world, ierr)
+
     if(irank.eq.0)then
         write(*,*) "irank=", irank
         return_num_wann=num_wann*numberlayer
@@ -298,7 +301,7 @@ program hao_edgestates
     ! call mpi_bcast(Hdim,1,MPI_INTEGER,0,mpi_comm_world,ierr)
     call mpi_bcast(return_num_wann,1,MPI_INTEGER,0,mpi_comm_world,ierr)
     write(*,*)"here is no problem2132131"
-
+call MPI_Barrier(mpi_comm_world, ierr)
 ! 进程0发送Hdim的值给其他进程
     if (irank == 0) then
         write(*,*) "start send message"
