@@ -383,7 +383,9 @@ program hao_edgestates
             k(ik) = ik*3*pi/numkpts
         enddo
     endif
-    call mpi_bcast(k,numkpts,MPI_DOUBLE_PRECISION,0,mpi_comm_world,ierr)    
+
+    length2 = numkpts
+    call mpi_bcast(k,length2,MPI_DOUBLE_PRECISION,0,mpi_comm_world,ierr)    
     ! write(*,*)"noproblem_here3" ,irank  
     ik_cpu = 0
     eigvals_per_k(:,:)=0
