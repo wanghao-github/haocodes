@@ -458,6 +458,7 @@ program hao_edgestates
                     do j=1,num_wann
                         phase=0d0
                         do i1=1,fourdim
+                            write(*,*) ii,i,j,fourdir(i1)
                             fourdirection=fourdir(i1)
                             phase=phase+(irvec(fourdirection,ii))*k(ik)
                         enddo
