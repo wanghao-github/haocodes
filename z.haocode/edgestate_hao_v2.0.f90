@@ -124,7 +124,7 @@ program hao_edgestates
       !!  到i=5的时候就是第二个原子了   这样temp(2)=1 然后temp变化为4 2 1 1 1,4 3 1 1 1, 4 4 1 1 1, 第二个原子的wannierfunctions 为i就是5 6 7 8
       !!! 到i=9的时候  temp(3) 从一开始  第三个原子上的wannierfunctions按i变化是9 10
       !!!! 总的来说每个原子的wannierfunctions获得在num_wann里面的编号
-
+        write(*,*) "temp ok"
         do i=1,ndiffatom
             if(ANY(atomarr(i)%wannierfunctions(:).eq.0).or.temp(i)-1.ne.wannperat(i)) then
                 write(*,*) 'mismatch assigning wannier functions to atoms, CALLING MPI ABORT'
@@ -154,6 +154,7 @@ program hao_edgestates
         allocate(fourdir(fourdim))
         read(100,'(I3,<fourdim>I3)')            layerdir,fourdir(:) 
         close(100)
+        write(*,*) "input_read OK"
     endif
 
     allocate(nrpts(rvecnum))
@@ -165,11 +166,11 @@ program hao_edgestates
         enddo
         read(400,'(<mod(rvecnum,15)>I5)') (nrpts(15*(rvecnum/15)+i),i=1,mod(rvecnum,15))
         close(400)
-    write(*,*) "nrpts_ok"
+        write(*,*) "nrpts_ok"
 
-    write(*,*) "fourdim" ,fourdim
-    write(*,*) "fourdir" ,fourdir
-    write(*,*) "layerdir" ,layerdir
+        write(*,*) "fourdim" ,fourdim
+        write(*,*) "fourdir" ,fourdir
+        write(*,*) "layerdir" ,layerdir
     endif
 
     call mpi_bcast(nrpts,rvecnum,MPI_INTEGER,0,mpi_comm_world,ierr)
