@@ -307,8 +307,7 @@ program hao_edgestates
         write(*,*)"here is no problem1"
     endif
 
-    call mpi_barrier(mpi_comm_world,ierr)
-    call mpi_bcast(layerintarr,Hdim,MPI_INTEGER,0,mpi_comm_world,ierr)
+    call mpi_bcast(layerintarr,size(layerintarr),MPI_INTEGER,0,mpi_comm_world,ierr)
     
     
     
