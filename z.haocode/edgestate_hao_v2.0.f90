@@ -190,21 +190,21 @@ program hao_edgestates
         allocate(layerintarr(Hdim))
         do while(i.le.Hdim)
             if(i.le.num_wann-nwannexup)then ! 轨道编号在第一个原胞之内
-                i1=1
-                i2=1
+                i1=1  !计数原子在超胞中的编号
+                i2=1  !记录每原子里面的wannier编号
                 do while (i.le.num_wann-nwannexup)
-                    if(.not.ANY(excludeup==i1))then   !如果i1不在任何排除的轨道之内
+                    if(.not.ANY(excludeup==i1))then   !如果i1不在任何排除的原子之内
                         wannierfunctioninHam(i)=atomarr(i1)%wannierfunctions(i2) !把这个原子的每个wannier轨道编号存到超胞Ham里
                         localisationpar(i)=atomarr(i1)%position(layerdir)+numberlayer-1
                         layerintarr(i)=1 
     
-                        if(i2.lt.size(atomarr(i1)%wannierfunctions(:)))then !i2是每个原子上的wannier的个数
+                        if(i2.lt.size(atomarr(i1)%wannierfunctions(:)))then !i2是每个原子上的wannier编号
                             i2=i2+1                                            
                         else
                             i2=1         !超过了每个原子上的wannier轨道个数后重新计数
                             i1=i1+1      !切换到下一个原子
                         endif
-                        i=i+1     !切换到下个wannier轨道
+                        i=i+1     !切换判断下个超胞wannier轨道 判断他在单胞中的编号
                     else
                         i1=i1+1   !如果这个原子被排除了
                     endif
@@ -212,7 +212,7 @@ program hao_edgestates
             elseif(i.le.Hdim+nwannexdown-num_wann)then   !除了第一个原胞外的其他轨道
                 do i1=1,ndiffatom                         ! 遍历所有原子
                     do i2=1,size(atomarr(i1)%wannierfunctions(:))        !i2仍然是每个原子上的wannier轨道个数
-                        wannierfunctioninHam(i)=atomarr(i1)%wannierfunctions(i2)!把每个原子上的wannier轨道个数存到超胞wannierfunctioninHam里面
+                        wannierfunctioninHam(i)=atomarr(i1)%wannierfunctions(i2)!把超胞wannierfunctioninHam里面每个轨道对应到单胞中的轨道编号上
                         localisationpar(i)=atomarr(i1)%position(layerdir)+numberlayer-(i+nwannexup-1)/num_wann-1
                         !每个原子在超胞中的位置  相比较于上一个在最边缘的多减了(i+nwannexup-1)/num_wann这一项 假如i是48 num_wann是44的话这样就多减了1 因为
                         !Fortran 整型相除舍弃了小数部分 相当于把layerdir那个方向的加了一个整数 直到-2 -3 -4 ....
@@ -225,7 +225,7 @@ program hao_edgestates
                 i2=1
                 do while (i.le.Hdim)                  !最后到HDIM那一点的轨道
                     if(.not.ANY(excludedown==i1))then    !如果这剩下一点的i1没在排除轨道里面
-                        wannierfunctioninHam(i)=atomarr(i1)%wannierfunctions(i2)  !把每个原子的每个轨道存到一个更大的超胞ham里
+                        wannierfunctioninHam(i)=atomarr(i1)%wannierfunctions(i2)  !判断超胞ham里每个轨道对应于单胞的哪个轨道
                         localisationpar(i)=atomarr(i1)%position(layerdir)!每个原子的位置 可以看出是从down开始计数的
                         layerintarr(i)=numberlayer           !这是最后一部分
                         if(i2.lt.size(atomarr(i1)%wannierfunctions(:)))then  !跟上面一样 如果每个原子上的wannier轨道用完了
@@ -245,7 +245,7 @@ program hao_edgestates
         locmax=MAXVAL(localisationpar,Hdim)                              ! 最大
         write(*,*) "locmin,locmax", locmin,locmax
         do i=1,Hdim
-            localisationpar(i)=-1d0+2d0*(localisationpar(i)-locmin)/(locmax-locmin) 把层数编号替换为分数坐标
+            localisationpar(i)=-1d0+2d0*(localisationpar(i)-locmin)/(locmax-locmin) !把层数编号替换为分数坐标
         enddo
 
         layerspreadmin=0
@@ -370,7 +370,8 @@ program hao_edgestates
                 zvalue = layerintarr(i)-layerintarr(j)      !计算超胞里面所有轨道之间的层号差别
                 if (zvalue.ge.layerspreadmin.and.zvalue.le.layerspreadmax) then   !如果这个层号差别的数在单胞的里面
                     hamiltonian(i,j)=hamiltonian(i,j)+fourHamilton(zvalue,wannierfunctioninham(i),wannierfunctioninham(j))
-                       !那么就把这些进行过傅里叶变换的矩阵元加在一起  超胞中的轨道编号 在沿着单方向傅里叶变换后的单胞哈密顿的对应
+                    !那么就把这些进行过傅里叶变换的矩阵元加在一起  超胞中的轨道编号与单方向傅里叶变换后的单胞wannier编号的对应
+                    !注意这个是差值相同的都会加起来  比如3和1  4和2 ....
                 endif
             enddo
         enddo
@@ -379,6 +380,8 @@ program hao_edgestates
         endif   
       
      call zheevx('V','A','U',Hdim,hamiltonian,Hdim,vl,vu,1,Hdim,abstol,ne,eigvals,eigvecs,Hdim,work,lwork,rwork,iwork, ifail,info)
+       !对角化这个超胞哈密顿量
+     
        do ib=1,Hdim
        write(*,*) "eigvals_per_k(ik,1)",eigvals(1)
             eigvals_per_k(ik,:) = eigvals(:)
