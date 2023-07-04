@@ -1,35 +1,35 @@
-iffcluster1919: Using Ethernet for MPI communication.
-iffcluster1919: Using Ethernet for MPI communication.
-iffcluster1919: Using Ethernet for MPI communication.
-iffcluster1919: Using Ethernet for MPI communication.
-iffcluster1919: Using Ethernet for MPI communication.
-iffcluster1919: Using Ethernet for MPI communication.
-iffcluster1919: Using Ethernet for MPI communication.
-iffcluster1919: Using Ethernet for MPI communication.
-iffcluster1919: Using Ethernet for MPI communication.
-iffcluster1919: Using Ethernet for MPI communication.
-iffcluster1919: Using Ethernet for MPI communication.
-iffcluster1919: Using Ethernet for MPI communication.
-iffcluster1919: Using Ethernet for MPI communication.
-iffcluster1919: Using Ethernet for MPI communication.
-iffcluster1919: Using Ethernet for MPI communication.
-iffcluster1919: Using Ethernet for MPI communication.
-iffcluster1919: Using Ethernet for MPI communication.
-iffcluster1919: Using Ethernet for MPI communication.
-iffcluster1919: Using Ethernet for MPI communication.
-iffcluster1919: Using Ethernet for MPI communication.
-iffcluster1919: Using Ethernet for MPI communication.
-iffcluster1919: Using Ethernet for MPI communication.
-iffcluster1919: Using Ethernet for MPI communication.
-iffcluster1919: Using Ethernet for MPI communication.
-iffcluster1919: Using Ethernet for MPI communication.
-iffcluster1919: Using Ethernet for MPI communication.
-iffcluster1919: Using Ethernet for MPI communication.
-iffcluster1919: Using Ethernet for MPI communication.
-iffcluster1919: Using Ethernet for MPI communication.
-iffcluster1919: Using Ethernet for MPI communication.
-iffcluster1919: Using Ethernet for MPI communication.
-iffcluster1919: Using Ethernet for MPI communication.
+iffcluster1902: Using Ethernet for MPI communication.
+iffcluster1902: Using Ethernet for MPI communication.
+iffcluster1902: Using Ethernet for MPI communication.
+iffcluster1902: Using Ethernet for MPI communication.
+iffcluster1902: Using Ethernet for MPI communication.
+iffcluster1902: Using Ethernet for MPI communication.
+iffcluster1902: Using Ethernet for MPI communication.
+iffcluster1902: Using Ethernet for MPI communication.
+iffcluster1902: Using Ethernet for MPI communication.
+iffcluster1902: Using Ethernet for MPI communication.
+iffcluster1902: Using Ethernet for MPI communication.
+iffcluster1902: Using Ethernet for MPI communication.
+iffcluster1902: Using Ethernet for MPI communication.
+iffcluster1902: Using Ethernet for MPI communication.
+iffcluster1902: Using Ethernet for MPI communication.
+iffcluster1902: Using Ethernet for MPI communication.
+iffcluster1902: Using Ethernet for MPI communication.
+iffcluster1902: Using Ethernet for MPI communication.
+iffcluster1902: Using Ethernet for MPI communication.
+iffcluster1902: Using Ethernet for MPI communication.
+iffcluster1902: Using Ethernet for MPI communication.
+iffcluster1902: Using Ethernet for MPI communication.
+iffcluster1902: Using Ethernet for MPI communication.
+iffcluster1902: Using Ethernet for MPI communication.
+iffcluster1902: Using Ethernet for MPI communication.
+iffcluster1902: Using Ethernet for MPI communication.
+iffcluster1902: Using Ethernet for MPI communication.
+iffcluster1902: Using Ethernet for MPI communication.
+iffcluster1902: Using Ethernet for MPI communication.
+iffcluster1902: Using Ethernet for MPI communication.
+iffcluster1902: Using Ethernet for MPI communication.
+iffcluster1902: Using Ethernet for MPI communication.
  isize=          32
  irank=           0
  rvecnum=         157
@@ -37,6 +37,12 @@ iffcluster1919: Using Ethernet for MPI communication.
          471
  irank=           0
  nrpts_ok
+ Hdim is           0
+ locmin,locmax -2147483648 -2147483648
+ Hdim is           0
+ locmin,locmax -2147483648 -2147483648
+ Hdim is           0
+ locmin,locmax -2147483648 -2147483648
  Hdim is         440
  locmin,locmax           0           9
  here is no problem
@@ -86,16 +92,10 @@ iffcluster1919: Using Ethernet for MPI communication.
  locmin,locmax -2147483648 -2147483648
  Hdim is           0
  locmin,locmax -2147483648 -2147483648
- Hdim is           0
- locmin,locmax -2147483648 -2147483648
- Hdim is           0
- locmin,locmax -2147483648 -2147483648
- Hdim is           0
- locmin,locmax -2147483648 -2147483648
- Hdim is           0
- locmin,locmax -2147483648 -2147483648
  here is no problem1
  here is no problem2
+ Hdim is           0
+ locmin,locmax -2147483648 -2147483648
  Hdim is           0
  locmin,locmax -2147483648 -2147483648
  Hdim is           0
