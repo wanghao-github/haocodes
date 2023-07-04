@@ -377,7 +377,7 @@ program hao_edgestates
                 endif
             enddo
         enddo
-        if(irank.eq.0)then    
+        if(irank.eq.1)then    
         write(*,*) "Ham",hamiltonian(:,:)
         endif   
       
