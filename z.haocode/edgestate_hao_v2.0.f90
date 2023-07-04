@@ -101,20 +101,27 @@ program hao_edgestates
         read(100,'(<num_wann>I3)') atomnumberarray(:)
         allocate(wannperat(ndiffatom))
         wannperat=0
-        do i=1,num_wann
+        do i=1,num_wann                                       !wannperatom存了每个原子上的轨道个数
             wannperat(atomnumberarray(i))=wannperat(atomnumberarray(i))+1
         enddo
         do i=1,ndiffatom
             atomarr(i)%number=i
-            allocate(atomarr(i)%wannierfunctions(wannperat(i)))
+            allocate(atomarr(i)%wannierfunctions(wannperat(i)))     !每个原子的wannierfunctions的维度是每个原子上轨道的个数
             atomarr(i)%wannierfunctions(wannperat(i))=0
         enddo
         allocate(temp(ndiffatom))
-        temp=1
+        temp=1          !temp 维度是原子个数 初始化为全1
         do i=1,num_wann
-            atomarr(atomnumberarray(i))%wannierfunctions(temp(atomnumberarray(i)))=i
+            atomarr(atomnumberarray(i))%wannierfunctions(temp(atomnumberarray(i)))=i  ! 前面是确定了原子的编号  对应的wannie轨道是i
             temp(atomnumberarray(i))=temp(atomnumberarray(i))+1
         enddo
+      !!! 比如 我的atomnumberarray是  1 1 1 1 2 2 2 2 3 3 4 4 4 5 5 5的话 
+      !!! temp一开始 是 1 1 1 1 1
+      !!  num_wann是16 循环第一句前半截获得了原子编号 temp循环变化 21111 ,31111,4111第一个原子的wannierfunctions 1 2 3 4
+      !!  到i=5的时候就是第二个原子了   这样temp(2)=1 然后temp变化为4 2 1 1 1,4 3 1 1 1, 4 4 1 1 1, 第二个原子的wannierfunctions 为i就是5 6 7 8
+      !!! 到i=9的时候  temp(3) 从一开始  第三个原子上的wannierfunctions按i变化是9 10
+      !!!! 总的来说每个原子的wannierfunctions获得在num_wann里面的编号
+
         do i=1,ndiffatom
             if(ANY(atomarr(i)%wannierfunctions(:).eq.0).or.temp(i)-1.ne.wannperat(i)) then
                 write(*,*) 'mismatch assigning wannier functions to atoms, CALLING MPI ABORT'
@@ -187,7 +194,7 @@ program hao_edgestates
                 i2=1
                 do while (i.le.num_wann-nwannexup)
                     if(.not.ANY(excludeup==i1))then   !如果i1不在任何排除的轨道之内
-                        wannierfunctioninHam(i)=atomarr(i1)%wannierfunctions(i2)
+                        wannierfunctioninHam(i)=atomarr(i1)%wannierfunctions(i2) !把这个原子的每个wannier轨道编号存到超胞Ham里
                         localisationpar(i)=atomarr(i1)%position(layerdir)+numberlayer-1
                         layerintarr(i)=1 
     
@@ -216,15 +223,15 @@ program hao_edgestates
             else                   !剩下的最下面不在excludedown里面的那半截 画图的话大概就是到最后Hdim那一点
                 i1=1
                 i2=1
-                do while (i.le.Hdim)                  !最后到HDIM那一点的
-                    if(.not.ANY(excludedown==i1))then
-                        wannierfunctioninHam(i)=atomarr(i1)%wannierfunctions(i2)
-                        localisationpar(i)=atomarr(i1)%position(layerdir)
-                        layerintarr(i)=numberlayer
-                        if(i2.lt.size(atomarr(i1)%wannierfunctions(:)))then
-                            i2=i2+1
+                do while (i.le.Hdim)                  !最后到HDIM那一点的轨道
+                    if(.not.ANY(excludedown==i1))then    !如果这剩下一点的i1没在排除轨道里面
+                        wannierfunctioninHam(i)=atomarr(i1)%wannierfunctions(i2)  !把每个原子的每个轨道存到一个更大的超胞ham里
+                        localisationpar(i)=atomarr(i1)%position(layerdir)!每个原子的位置 可以看出是从down开始计数的
+                        layerintarr(i)=numberlayer           !这是最后一部分
+                        if(i2.lt.size(atomarr(i1)%wannierfunctions(:)))then  !跟上面一样 如果每个原子上的wannier轨道用完了
+                            i2=i2+1                                          !就开始循环下一个原子
                         else
-                            i2=1
+                            i2=1                                           
                             i1=i1+1
                         endif
                         i=i+1
@@ -234,24 +241,24 @@ program hao_edgestates
                 enddo
             endif
         enddo
-        locmin=MINVAL(localisationpar,Hdim)
-        locmax=MAXVAL(localisationpar,Hdim)
+        locmin=MINVAL(localisationpar,Hdim)                              ! 获取在这个超胞中最小的层数编号
+        locmax=MAXVAL(localisationpar,Hdim)                              ! 最大
         write(*,*) "locmin,locmax", locmin,locmax
         do i=1,Hdim
-            localisationpar(i)=-1d0+2d0*(localisationpar(i)-locmin)/(locmax-locmin)
+            localisationpar(i)=-1d0+2d0*(localisationpar(i)-locmin)/(locmax-locmin) 把层数编号替换为分数坐标
         enddo
 
         layerspreadmin=0
         layerspreadmax=0
         do i=1,rvecnum
-            if(irvec(layerdir,i).gt.layerspreadmax)then
-                layerspreadmax=irvec(layerdir,i)
+            if(irvec(layerdir,i).gt.layerspreadmax)then             !获取recrum在layerdir方向上的最大值和最小值
+                layerspreadmax=irvec(layerdir,i)             
             endif
             if(irvec(layerdir,i).lt.layerspreadmin)then
                 layerspreadmin=irvec(layerdir,i)
             endif
         enddo
-        layerspread=layerspreadmax-layerspreadmin
+        layerspread=layerspreadmax-layerspreadmin                   !获得原Hr在这个方向上的差值
 
     !endif
 
@@ -349,7 +356,7 @@ program hao_edgestates
                             fourdirection=fourdir(i1)
                             phase=phase+(irvec(fourdirection,ii))*k(ik)
                         enddo
-                        fac=cmplx(cos(phase),sin(phase))
+                        fac=cmplx(cos(phase),sin(phase))                    ! (原始的单胞Hr只在fourdir上做傅里叶变换)
                         fourHamilton(irvec(layerdir,ii),i,j)=fourHamilton(irvec(layerdir,ii),i,j)+fac*hops(i,j,ii)/nrpts(ii)
                     enddo       
                 enddo 
@@ -360,9 +367,10 @@ program hao_edgestates
         hamiltonian=cmplx(0d0,0d0)
         do i=1,Hdim
             do j=1,Hdim
-                zvalue = layerintarr(i)-layerintarr(j)
-                if (zvalue.ge.layerspreadmin.and.zvalue.le.layerspreadmax) then
+                zvalue = layerintarr(i)-layerintarr(j)      !计算超胞里面所有轨道之间的层号差别
+                if (zvalue.ge.layerspreadmin.and.zvalue.le.layerspreadmax) then   !如果这个层号差别的数在单胞的里面
                     hamiltonian(i,j)=hamiltonian(i,j)+fourHamilton(zvalue,wannierfunctioninham(i),wannierfunctioninham(j))
+                       !那么就把这些进行过傅里叶变换的矩阵元加在一起  超胞中的轨道编号 在沿着单方向傅里叶变换后的单胞哈密顿的对应
                 endif
             enddo
         enddo
