@@ -452,6 +452,7 @@ program hao_edgestates
            time_start= time_end
         endif
             fourHamilton=0d0
+            write(*,*) "before  fourHam irank=",irank
             do ii=1,rvecnum   
                 do i=1,num_wann
                     do j=1,num_wann
