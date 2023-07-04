@@ -455,7 +455,9 @@ program hao_edgestates
             write(*,*) "before  fourHam irank=",irank
             do ii=1,rvecnum   
                 do i=1,num_wann
+                    write(*,*) i
                     do j=1,num_wann
+                        write(*,*) j
                         phase=0d0
                         do i1=1,fourdim
                             write(*,*) ii,i,j,fourdir(i1)
