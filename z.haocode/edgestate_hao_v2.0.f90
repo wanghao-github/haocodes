@@ -209,14 +209,14 @@ program hao_edgestates
                         localisationpar(i)=atomarr(i1)%position(layerdir)+numberlayer-(i+nwannexup-1)/num_wann-1
                         !每个原子在超胞中的位置  相比较于上一个在最边缘的多减了(i+nwannexup-1)/num_wann这一项 假如i是48 num_wann是44的话这样就多减了1 因为
                         !Fortran 整型相除舍弃了小数部分 相当于把layerdir那个方向的加了一个整数 直到-2 -3 -4 ....
-                        layerintarr(i)=(i+nwannexup-1)/num_wann+1
-                        i=i+1
+                        layerintarr(i)=(i+nwannexup-1)/num_wann+1   !这个地方和前面一样相当于计算出了i的层数
+                        i=i+1                                      !计算下一个i
                     enddo
                 enddo
-            else
+            else                   !剩下的最下面不在excludedown里面的那半截 画图的话大概就是到最后Hdim那一点
                 i1=1
                 i2=1
-                do while (i.le.Hdim)
+                do while (i.le.Hdim)                  !最后到HDIM那一点的
                     if(.not.ANY(excludedown==i1))then
                         wannierfunctioninHam(i)=atomarr(i1)%wannierfunctions(i2)
                         localisationpar(i)=atomarr(i1)%position(layerdir)
