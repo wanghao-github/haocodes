@@ -304,17 +304,17 @@ program hao_edgestates
         write(*,*) "start send message"
         do i = 1, isize-1
             write(*,*) "i = ",i
-            call MPI_Send(Hdim, 1, MPI_INTEGER, i, 0, mpi_comm_world, ierr)
+            ! call MPI_Send(Hdim, 1, MPI_INTEGER, i, 0, mpi_comm_world, ierr)
         end do
-    else
-        call MPI_Recv(Hdim, 1, MPI_INTEGER, 0, 0, mpi_comm_world, stt, ierr)
+    ! else
+    !     call MPI_Recv(Hdim, 1, MPI_INTEGER, 0, 0, mpi_comm_world, stt, ierr)
     end if
     
-    ! 所有进程在此处等待，直到所有进程都接收到了Hdim的值
-    call MPI_Barrier(mpi_comm_world, ierr)
+    ! ! 所有进程在此处等待，直到所有进程都接收到了Hdim的值
+    ! call MPI_Barrier(mpi_comm_world, ierr)
     
-    ! 广播layerintarr的内容
-    call MPI_Bcast(layerintarr, Hdim, MPI_INTEGER, 0, mpi_comm_world, ierr)    
+    ! ! 广播layerintarr的内容
+    ! call MPI_Bcast(layerintarr, Hdim, MPI_INTEGER, 0, mpi_comm_world, ierr)    
 
 
 ! ! 发送Hdim的值
