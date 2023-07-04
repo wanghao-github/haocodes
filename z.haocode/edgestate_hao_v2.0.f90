@@ -299,13 +299,7 @@ program hao_edgestates
     call mpi_bcast(return_num_wann,1,MPI_INTEGER,0,mpi_comm_world,ierr)
     write(*,*)"here is no problem2132131"
 
-    allocate(eigvals_per_k(numkpts,Hdim))
-    ! call mpi_bcast(eigvals_per_k,size(eigvals_per_k),MPI_DOUBLE_PRECISION,0,mpi_comm_world,ierr)   
-    eigvals_per_k=0.0
-   
-    if (irank.eq.0) then
-        write(*,*)"here is no problem1"
-    endif
+
 
 
 ! 发送Hdim的值
@@ -321,7 +315,13 @@ program hao_edgestates
     call MPI_Bcast(layerintarr, Hdim, MPI_INTEGER, 0, mpi_comm_world, ierr)
     
 
-
+    allocate(eigvals_per_k(numkpts,Hdim))
+    ! call mpi_bcast(eigvals_per_k,size(eigvals_per_k),MPI_DOUBLE_PRECISION,0,mpi_comm_world,ierr)   
+    eigvals_per_k=0.0
+   
+    if (irank.eq.0) then
+        write(*,*)"here is no problem1"
+    endif
 
     ! call mpi_bcast(layerintarr,Hdim,MPI_INTEGER,0,mpi_comm_world,ierr)
     
