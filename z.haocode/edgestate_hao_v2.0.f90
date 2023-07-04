@@ -335,7 +335,7 @@ program hao_edgestates
         enddo
     endif
     call mpi_bcast(k,numkpts,MPI_DOUBLE_PRECISION,0,mpi_comm_world,ierr)    
-    write(*,*)"noproblem_here3" ,irank  
+    ! write(*,*)"noproblem_here3" ,irank  
     ik_cpu = 0
     eigvals_per_k(:,:)=0
     ! do ik=1,numkpts
@@ -351,6 +351,7 @@ program hao_edgestates
             !eigvals_per_k(ik,:)=0
 
     do ik= 1+ irank, numkpts, isize
+        write(*,*) "k loop start","ik=",ik
         if (irank .eq. 0 .and. mod(ik/isize, 1) .eq. 0) then
          call now(time_end) 
           write(*, '(a, i18, "/", i18, a, f10.2, "s")') 'ik/knv3', &
