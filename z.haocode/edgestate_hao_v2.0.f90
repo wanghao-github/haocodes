@@ -178,9 +178,11 @@ program hao_edgestates
     write(*,*) "hereeeee" 
 
     call mpi_bcast(fourdim,1,MPI_INTEGER,0,mpi_comm_world,ierr)
+    write(*,*) "he" 
     call mpi_bcast(fourdir,fourdim,MPI_INTEGER,0,mpi_comm_world,ierr)
+    write(*,*) "hsdasdasdasd" 
     call mpi_bcast(layerdir,1,MPI_INTEGER,0,mpi_comm_world,ierr)
-
+    write(*,*) "hqqqqqqqqqq" 
     if(irank.eq.0)then
         write(*,*) "irank=", irank
         return_num_wann=num_wann*numberlayer
