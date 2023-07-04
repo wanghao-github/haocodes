@@ -179,7 +179,7 @@ program hao_edgestates
 
     call mpi_bcast(fourdim,1,MPI_INTEGER,0,mpi_comm_world,ierr)
     write(*,*) "he" 
-    call mpi_bcast(fourdir,fourdim,MPI_INTEGER,0,mpi_comm_world,ierr)
+    call mpi_bcast(fourdir,size(fourdir),MPI_INTEGER,0,mpi_comm_world,ierr)
     write(*,*) "hsdasdasdasd" 
     call mpi_bcast(layerdir,1,MPI_INTEGER,0,mpi_comm_world,ierr)
     write(*,*) "hqqqqqqqqqq" 
