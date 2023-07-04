@@ -297,15 +297,27 @@ program hao_edgestates
     endif
     call mpi_bcast(atomarr,ndiffatom,MPI_INTEGER,0,mpi_comm_world,ierr)
 
+    if (irank.eq.0) then    
+        write(*,*)"here is no problem3"
+      endif
+
     if(.not.allocated(excludeup))then 
         allocate(excludeup(nexcludeup))
     endif
     call mpi_bcast(excludeup,nexcludeup,MPI_INTEGER,0,mpi_comm_world,ierr)
 
+    if (irank.eq.0) then    
+        write(*,*)"here is no problem4"
+      endif
+
     if(.not.allocated(excludedown))then 
         allocate(excludedown(nexcludedown))
     endif
     call mpi_bcast(excludedown,nexcludedown,MPI_INTEGER,0,mpi_comm_world,ierr)
+
+    if (irank.eq.0) then    
+        write(*,*)"here is no problem5"
+      endif
 
     if(.not.allocated(layerintarr))then 
         allocate(layerintarr(Hdim))
@@ -313,7 +325,7 @@ program hao_edgestates
     call mpi_bcast(layerintarr,Hdim,MPI_INTEGER,0,mpi_comm_world,ierr)
 
     if (irank.eq.0) then    
-        write(*,*)"here is no problem3"
+        write(*,*)"here is no problem6"
       endif
 
         allocate(eigvals(Hdim))
