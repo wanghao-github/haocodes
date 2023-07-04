@@ -154,6 +154,7 @@ program hao_edgestates
         allocate(fourdir(fourdim))
         read(100,'(I3,<fourdim>I3)')            layerdir,fourdir(:) 
         close(100)
+        desallocate(fourdir)
         write(*,*) "input_read OK"
         write(*,*) "fourdir" , fourdir
     endif
