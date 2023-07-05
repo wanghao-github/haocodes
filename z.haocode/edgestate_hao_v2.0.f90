@@ -5,7 +5,7 @@ program hao_edgestates
     !  mpiifort -CB -r8 edgestate_hao.f90   -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread -o edge_states_hao.x
     implicit none
 
-    integer              :: nwannexup,nwannexdown,ix,iy,iz,band1,band2,rvecnum,nslab1,nslab2,ii,zvalue,ib
+    integer              :: nwannexup,nwannexdown,ix,iy,iz,band1,band2,rvecnum,nslab1,nslab2,ii,zvalue,ib,sendcount
     real                 :: fermi,rdum,idum,pi,phase,lattice_vec(3,3)
     integer,allocatable  :: nrpts(:),irvec(:,:)
     complex,allocatable  :: hops(:,:,:),ham(:,:),fourHamilton(:,:,:),hamiltonian(:,:)
@@ -18,7 +18,7 @@ program hao_edgestates
     integer              :: ndiffatom,nexcludeup,nexcludedown,return_num_wann,locmin,locmax,i1,i2
     real                 :: vl,vu,abstol,ik1,time_start,time_end
     integer              :: length,length1,length2,length3,length4,length5
-    real,allocatable     :: eigvals(:),eigvals_per_k(:,:)
+    real,allocatable     :: eigvals(:),eigvals_per_k(:,:),temp_array
     complex,allocatable  :: eigvecs(:,:)
     integer              :: ne,info,lwork,ik_cpu
     complex,allocatable  :: work(:)
@@ -416,6 +416,7 @@ call MPI_Barrier(mpi_comm_world, ierr)
 
         allocate(eigvals(Hdim))
         allocate(eigvecs(Hdim,Hdim))
+        allocate(temp_array(Hdim))
         lwork=12.0*Hdim
         allocate(work(lwork) )
         allocate(rwork(7*Hdim) )
@@ -539,8 +540,26 @@ call MPI_Barrier(mpi_comm_world, ierr)
     ! if (irank /= 0) then
     !    call MPI_Send(eigvals(:), Hdim, MPI_DOUBLE_COMPLEX, 0, irank, MPI_COMM_WORLD, ierr)
     ! else
-       eigvals_per_k(ik, :) = eigvals(:)
-       write(*,*) "ik eigvals", ik, eigvals(:)
+    
+         ! 将部分结果存储到临时数组
+         temp_array = eigvals(:)
+     
+         ! 在所有CPU上进行归约操作
+         call MPI_Allreduce(MPI_IN_PLACE, temp_array, Hdim, MPI_DOUBLE_COMPLEX, MPI_SUM, MPI_COMM_WORLD, ierr)
+     
+         ! 确定每个CPU发送的数据量
+         sendcount = Hdim
+     
+         ! 收集每个CPU的结果到最终矩阵
+         call MPI_Gather(temp_array, sendcount, MPI_DOUBLE_COMPLEX, eigvals_per_k(ik, :), sendcount, MPI_DOUBLE_COMPLEX, 0, MPI_COMM_WORLD, ierr)
+     end do
+     
+       
+
+
+
+    !    eigvals_per_k(ik, :) = eigvals(:)
+    !    write(*,*) "ik eigvals", ik, eigvals(:)
     !    write(*,*) "ik eigvals write done", "ik=",ik, "irank =" ,irank
     !    do i = 1, isize - 1
     !         call MPI_Recv(eigvals(:), Hdim, MPI_DOUBLE_COMPLEX, 0, i,MPI_COMM_WORLD, stt, ierr)
