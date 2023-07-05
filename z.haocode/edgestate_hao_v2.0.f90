@@ -401,7 +401,7 @@ call MPI_Barrier(mpi_comm_world, ierr)
         allocate(ifail(Hdim) )
         allocate(k(numkpts))
         allocate(omega(omeganum))
-        allocate(ones(Ndim))
+        allocate(ones(Ndim,Ndim))
         allocate(GLL(Ndim, Ndim))
         allocate(GRR(Ndim, Ndim))
         allocate(GB (Ndim, Ndim))
@@ -442,7 +442,7 @@ call MPI_Barrier(mpi_comm_world, ierr)
         enddo
 
         do i= 1, omeganum
-            omega(i)=-2+(i-1)*(2-(-2)))/dble(omeganum)
+            omega(i)=-2+(i-1)*(2-(-2))/dble(omeganum)
         enddo
         
         do i=1,Ndim
@@ -609,7 +609,7 @@ subroutine now(time_now)
 
     ! >> local variables
     ! iteration number
-    integer :: iter
+    integer :: iter,Ndim
 
     ! maximun iteration 
     integer ,parameter:: itermax=100
@@ -619,7 +619,7 @@ subroutine now(time_now)
 
     ! a real type temp variable
     real(kind(1.0d0)) :: real_temp
-
+    real(kind(1.0d0)) :: eta
     ! omegac=omega(i)+I * eta
     complex(kind(1.0d0)) :: omegac 
 
@@ -637,6 +637,7 @@ subroutine now(time_now)
     ! g0= inv(w-e_i)
     complex(kind(1.0d0)), allocatable :: g0 (:, :) 
 
+    eta = 0.000000001
     ! allocate some variables
     allocate(alphai(Ndim, Ndim)) 
     allocate(betai (Ndim, Ndim)) 
@@ -655,7 +656,7 @@ subroutine now(time_now)
    !print *, sqrt(sum(abs(H00)**2)), 'H00'
 
     ! w+i*0^+
-    omegac= dcmplx(omega, eta)
+    omegac= cmplx(omega, eta)
    !print *, omegac
 
     ! begin iteration
