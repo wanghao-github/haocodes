@@ -170,14 +170,14 @@ program hao_edgestates
         read(400,'(<mod(rvecnum,15)>I5)') (nrpts(15*(rvecnum/15)+i),i=1,mod(rvecnum,15))
         close(400)
         write(*,*) "nrpts_ok"
-
+        write(*,*) "numkpts" ,numkpts
         write(*,*) "fourdim" ,fourdim
         write(*,*) "fourdir" ,fourdir
         write(*,*) "layerdir" ,layerdir
     endif
 
     call mpi_bcast(numkpts,1,MPI_INTEGER,0,mpi_comm_world,ierr)
-    
+
     if(.not.allocated(nrpts))then 
         allocate(nrpts(rvecnum))
     endif
