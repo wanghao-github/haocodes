@@ -86,6 +86,10 @@ program hao_edgestates
     call mpi_bcast(rvecnum,1,MPI_INTEGER,0,mpi_comm_world,ierr)
     call mpi_bcast(numkpts,1,MPI_INTEGER,0,mpi_comm_world,ierr)
 
+    if(.not.allocated(irvec)) then 
+        allocate(irvec(3,rvecnum))
+    endif 
+    call mpi_bcast(irvec,size(irvec),MPI_INTEGER,0,mpi_comm_world,ierr)
 
     if(.not.allocated(hops)) then 
         allocate(hops(num_wann,num_wann,rvecnum))
@@ -175,7 +179,12 @@ program hao_edgestates
         write(*,*) "layerdir" ,layerdir
     endif
 
+
+    if(.not.allocated(nrpts))then 
+        allocate(nrpts(rvecnum))
+    endif
     call mpi_bcast(nrpts,rvecnum,MPI_INTEGER,0,mpi_comm_world,ierr)
+    
     call mpi_bcast(numberlayer,1,MPI_INTEGER,0,mpi_comm_world,ierr)
 
     call mpi_bcast(ndiffatom,1,MPI_INTEGER,0,mpi_comm_world,ierr)
@@ -526,15 +535,15 @@ call MPI_Barrier(mpi_comm_world, ierr)
             ! eigvals_per_k(ik,:) = eigvals(:)
     !    enddo
  !    call mpi_barrier(mpi_comm_world,ierr)
-    if (irank /= 0) then
-       call MPI_Send(eigvals(:), Hdim, MPI_DOUBLE_COMPLEX, 0, irank, MPI_COMM_WORLD, ierr)
-    else
-       eigvals_per_k(ik, :) = eigvals(:)
-       do i = 1, isize - 1
-            call MPI_Recv(eigvals(:), Hdim, MPI_DOUBLE_COMPLEX, i, i,MPI_COMM_WORLD, stt, ierr)
-            eigvals_per_k(ik, :) = eigvals_per_k(ik, :) + eigvals(:)
-       end do
-   end if     
+!     if (irank /= 0) then
+!        call MPI_Send(eigvals(:), Hdim, MPI_DOUBLE_COMPLEX, 0, irank, MPI_COMM_WORLD, ierr)
+!     else
+!        eigvals_per_k(ik, :) = eigvals(:)
+!        do i = 1, isize - 1
+!             call MPI_Recv(eigvals(:), Hdim, MPI_DOUBLE_COMPLEX, i, i,MPI_COMM_WORLD, stt, ierr)
+!             eigvals_per_k(ik, :) = eigvals_per_k(ik, :) + eigvals(:)
+!        end do
+!    end if     
 enddo
 
     if(irank.eq.0)then
