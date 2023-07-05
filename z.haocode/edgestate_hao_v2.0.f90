@@ -346,9 +346,10 @@ call MPI_Barrier(mpi_comm_world, ierr)
 !     ! 广播layerintarr的内容
 !     call MPI_Bcast(layerintarr, Hdim, MPI_INTEGER, 0, mpi_comm_world, ierr)
     
-
-    allocate(eigvals_per_k(numkpts,Hdim))
-    ! call mpi_bcast(eigvals_per_k,size(eigvals_per_k),MPI_DOUBLE_PRECISION,0,mpi_comm_world,ierr)   
+    if(.not.allocated(eigvals_per_k))then 
+        allocate(eigvals_per_k(numkpts,Hdim))
+    endif
+    call mpi_bcast(eigvals_per_k,size(eigvals_per_k),MPI_DOUBLE_PRECISION,0,mpi_comm_world,ierr)   
     eigvals_per_k=0.0
    
     if (irank.eq.0) then
@@ -368,37 +369,37 @@ call MPI_Barrier(mpi_comm_world, ierr)
     
 
     
-    ! if(.not.allocated(atomarr))then 
-    !     allocate(atomarr(ndiffatom))
-    ! endif
-    ! call mpi_bcast(atomarr,ndiffatom,MPI_INTEGER,0,mpi_comm_world,ierr)
+    if(.not.allocated(atomarr))then 
+        allocate(atomarr(ndiffatom))
+    endif
+    call mpi_bcast(atomarr,ndiffatom,MPI_INTEGER,0,mpi_comm_world,ierr)
 
-    ! if (irank.eq.0) then    
-    !     write(*,*)"here is no problem3"
-    !   endif
+    if (irank.eq.0) then    
+        write(*,*)"here is no problem3"
+      endif
 
-    ! if(.not.allocated(excludeup))then 
-    !     allocate(excludeup(nexcludeup))
-    ! endif
-    ! call mpi_bcast(excludeup,nexcludeup,MPI_INTEGER,0,mpi_comm_world,ierr)
+    if(.not.allocated(excludeup))then 
+        allocate(excludeup(nexcludeup))
+    endif
+    call mpi_bcast(excludeup,nexcludeup,MPI_INTEGER,0,mpi_comm_world,ierr)
 
-    ! if (irank.eq.0) then    
-    !     write(*,*)"here is no problem4"
-    !   endif
+    if (irank.eq.0) then    
+        write(*,*)"here is no problem4"
+      endif
 
-    ! if(.not.allocated(excludedown))then 
-    !     allocate(excludedown(nexcludedown))
-    ! endif
-    ! call mpi_bcast(excludedown,nexcludedown,MPI_INTEGER,0,mpi_comm_world,ierr)
+    if(.not.allocated(excludedown))then 
+        allocate(excludedown(nexcludedown))
+    endif
+    call mpi_bcast(excludedown,nexcludedown,MPI_INTEGER,0,mpi_comm_world,ierr)
 
-    ! if (irank.eq.0) then    
-    !     write(*,*)"here is no problem5"
-    !   endif
+    if (irank.eq.0) then    
+        write(*,*)"here is no problem5"
+      endif
 
-    ! if(.not.allocated(layerintarr))then 
-    !     allocate(layerintarr(Hdim))
-    ! endif
-    
+    if(.not.allocated(layerintarr))then 
+        allocate(layerintarr(Hdim))
+    endif
+    call mpi_bcast(layerintarr,Hdim,MPI_INTEGER,0,mpi_comm_world,ierr)
 
     if (irank.eq.0) then    
         write(*,*)"here is no problem6"
@@ -418,13 +419,17 @@ call MPI_Barrier(mpi_comm_world, ierr)
             write(*,*)"here is no problem7"
           endif
 
-        ! allocate(fourHamilton(layerspreadmin:layerspreadmax,num_wann,num_wann))
-        ! length = layerspread*num_wann*num_wann
-        ! call mpi_bcast(fourHamilton,length,MPI_DOUBLE_PRECISION,0,mpi_comm_world,ierr)
 
-        ! allocate(hamiltonian(Hdim,Hdim))
-        ! length3 = Hdim*Hdim
-        ! call mpi_bcast(hamiltonian,length3,MPI_DOUBLE_PRECISION,0,mpi_comm_world,ierr)
+        if(.not.allocated(fourHamilton))then 
+            allocate(fourHamilton(layerspreadmin:layerspreadmax,num_wann,num_wann))
+        endif
+        call mpi_bcast(fourHamilton,size(fourHamilton),MPI_DOUBLE_PRECISION,0,mpi_comm_world,ierr)
+
+
+        if(.not.allocated(hamiltonian))then 
+            allocate(hamiltonian(Hdim,Hdim))
+        endif
+        call mpi_bcast(hamiltonian,size(hamiltonian),MPI_DOUBLE_PRECISION,0,mpi_comm_world,ierr)
 
 
         ! if (irank.eq.0) then    
@@ -432,20 +437,25 @@ call MPI_Barrier(mpi_comm_world, ierr)
         !     write(*,*),wannierfunctioninham
         !   endif
         
-
-        ! call mpi_bcast(wannierfunctioninham,Hdim,MPI_INTEGER,0,mpi_comm_world,ierr)
+        if(.not.allocated(wannierfunctioninham))then 
+            allocate(wannierfunctioninham(Hdim))
+        endif
+        call mpi_bcast(wannierfunctioninham,Hdim,MPI_INTEGER,0,mpi_comm_world,ierr)
   
-        ! if (irank.eq.0) then    
-        !     write(*,*)"here is no problem12"
-        ! endif
-          call mpi_barrier(mpi_comm_world,ierr)
-        ! if(irank.eq.0)then 
+        if (irank.eq.0) then    
+            write(*,*)"here is no problem12"
+        endif
+        call mpi_barrier(mpi_comm_world,ierr)
+    if(irank.eq.0)then 
         do ik=1,numkpts
             k(ik) = ik*3*pi/numkpts
         enddo
-    ! endif
-
-    ! call mpi_bcast(k,numkpts,MPI_DOUBLE_PRECISION,0,mpi_comm_world,ierr)    
+    endif
+        
+    if(.not.allocated(k))then 
+            allocate(k(numkpts))
+        endif
+    call mpi_bcast(k,numkpts,MPI_DOUBLE_PRECISION,0,mpi_comm_world,ierr)    
     ! write(*,*)"noproblem_here3" ,irank  
     ! ik_cpu = 0
     ! do ik=1,numkpts
@@ -478,14 +488,14 @@ call MPI_Barrier(mpi_comm_world, ierr)
                         write(*,*) "j=",j
                         phase=0d0
                         write(*,*) "phase=",phase
-                        ! do i1=1,fourdim
-                        !     write(*,*) "fourdim=",fourdim
-                        !     ! write(*,*) ii,i,j,fourdir(i1)
-                        !     fourdirection=fourdir(i1)
-                        !     phase=phase+(irvec(fourdirection,ii))*k(ik)
-                        ! enddo
-                        ! fac=cmplx(cos(phase),sin(phase))                    ! (原始的单胞Hr只在fourdir上做傅里叶变换)
-                        ! fourHamilton(irvec(layerdir,ii),i,j)=fourHamilton(irvec(layerdir,ii),i,j)+fac*hops(i,j,ii)/nrpts(ii)
+                        do i1=1,fourdim
+                            write(*,*) "fourdim=",fourdim
+                            ! write(*,*) ii,i,j,fourdir(i1)
+                            fourdirection=fourdir(i1)
+                            phase=phase+(irvec(fourdirection,ii))*k(ik)
+                        enddo
+                        fac=cmplx(cos(phase),sin(phase))                    ! (原始的单胞Hr只在fourdir上做傅里叶变换)
+                        fourHamilton(irvec(layerdir,ii),i,j)=fourHamilton(irvec(layerdir,ii),i,j)+fac*hops(i,j,ii)/nrpts(ii)
                     enddo       
                 enddo 
             enddo
@@ -515,15 +525,15 @@ call MPI_Barrier(mpi_comm_world, ierr)
             eigvals_per_k(ik,:) = eigvals(:)
     !    enddo
  !    call mpi_barrier(mpi_comm_world,ierr)
- !   if (irank /= 0) then
- !       call MPI_Send(eigvals(:), Hdim, MPI_DOUBLE_COMPLEX, 0, irank, MPI_COMM_WORLD, ierr)
-  !  else
-      !  eigvals_per_k(ik, :) = eigvals(:)
-  !      do i = 1, isize - 1
-  !!          call MPI_Recv(eigvals(:), Hdim, MPI_DOUBLE_COMPLEX, i, i,MPI_COMM_WORLD, MPI_STATUS_IGNORE, ierr)
-   !         eigvals_per_k(ik, :) = eigvals_per_k(ik, :) + eigvals(:)
-   !     end do
-   ! end if     
+    if (irank /= 0) then
+       call MPI_Send(eigvals(:), Hdim, MPI_DOUBLE_COMPLEX, 0, irank, MPI_COMM_WORLD, ierr)
+    else
+       eigvals_per_k(ik, :) = eigvals(:)
+       do i = 1, isize - 1
+            call MPI_Recv(eigvals(:), Hdim, MPI_DOUBLE_COMPLEX, i, i,MPI_COMM_WORLD, MPI_STATUS_IGNORE, ierr)
+            eigvals_per_k(ik, :) = eigvals_per_k(ik, :) + eigvals(:)
+       end do
+   end if     
 enddo
 
     if(irank.eq.0)then
