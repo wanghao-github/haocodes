@@ -552,7 +552,7 @@ call MPI_Barrier(mpi_comm_world, ierr)
      
          ! 收集每个CPU的结果到最终矩阵
          call MPI_Gather(temp_array, sendcount, MPI_DOUBLE_COMPLEX, eigvals_per_k(ik, :), sendcount, MPI_DOUBLE_COMPLEX, 0, MPI_COMM_WORLD, ierr)
-     end do
+    !  end do
      
        
 
