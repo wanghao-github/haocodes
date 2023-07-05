@@ -520,7 +520,7 @@ call MPI_Barrier(mpi_comm_world, ierr)
         
         do j = 1, omeganum
             w=omega(j)
-            call surfgreen_1985(w,GLL,GRR,GB,H00,H01,ones)
+            call surfgreen_1985(Ndim,w,GLL,GRR,GB,H00,H01,ones)
             
             do i= 1,num_wann
                 dos_l(ik, j)=dos_l(ik,j)- aimag(GLL(i,i))
@@ -544,7 +544,7 @@ call mpi_reduce(dos_bulk, dos_bulk_mpi, size(dos_bulk),MPI_DOUBLE_PRECISION,MPI_
 
 dos_l=log(abs(dos_l_mpi))
 dos_r=log(abs(dos_r_mpi))
-dos_bulk=log(abs(dos_bulk_mpi)+eps9)
+dos_bulk=log(abs(dos_bulk_mpi)+0.000000001)
     if(irank.eq.0)then
         open(222,file='kpts.out',recl=10000)
         do ik=1,numkpts
@@ -582,14 +582,14 @@ subroutine now(time_now)
     return
  end subroutine now
 
- subroutine surfgreen_1985(omega,GLL,GRR,GB,H00,H01,ones)
+ subroutine surfgreen_1985(Ndim,omega,GLL,GRR,GB,H00,H01,ones)
     implicit none
 
     ! inout variables     
     ! the factor 2 is induced by spin
     ! energy hbar omega
     real(kind(1.0d0)),intent(in) :: omega  
-
+    integer, intent(in) :: Ndim
     ! H00 Hamiltonian between nearest neighbour-quintuple-layers
     complex(kind(1.0d0)),intent(in) :: H00(Ndim,Ndim)
 
@@ -609,7 +609,7 @@ subroutine now(time_now)
 
     ! >> local variables
     ! iteration number
-    integer :: iter,Ndim
+    integer :: iter
 
     ! maximun iteration 
     integer ,parameter:: itermax=100
