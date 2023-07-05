@@ -495,56 +495,58 @@ call MPI_Barrier(mpi_comm_world, ierr)
        write(*,*) "write eigvals OK, irank =" ,irank
 
        !!!!接下来抄的WT的
-        H00=0.0d0   !!!定义H00 和H01
-        H01=0.0d0
-        do i=1,Np
-            do j=1,Np
-                if (abs(i-j).le.(ijmax)) then
-                    H00(num_wann*(i-1)+1:num_wann*i,num_wann*(j-1)+1:num_wann*j)=fourHamilton(j-i,i,j)
-                    !!!这个是([[0 1],[-1,0]])的大块矩阵
-                endif
-            enddo
-        enddo
+        ! H00=0.0d0   !!!定义H00 和H01
+        ! H01=0.0d0
+        ! do i=1,Np
+        !     do j=1,Np
+        !         if (abs(i-j).le.(ijmax)) then
+        !             H00(num_wann*(i-1)+1:num_wann*i,num_wann*(j-1)+1:num_wann*j)=fourHamilton(j-i,i,j)
+        !             !!!这个是([[0 1],[-1,0]])的大块矩阵
+        !         endif
+        !     enddo
+        ! enddo
 
 
-        !!! H01new
-        do i=1,Np
-            do j=Np+1,Np*2
-                if (j-i.le.ijmax) then
-                    H01(num_wann*(i-1)+1:num_wann*i,num_wann*(j-1-Np)+1:num_wann*(j-Np))=fourHamilton(j-i,i,j)
-                endif
-            enddo
-        enddo
+        ! !!! H01new
+        ! do i=1,Np
+        !     do j=Np+1,Np*2
+        !         if (j-i.le.ijmax) then
+        !             H01(num_wann*(i-1)+1:num_wann*i,num_wann*(j-1-Np)+1:num_wann*(j-Np))=fourHamilton(j-i,i,j)
+        !         endif
+        !     enddo
+        ! enddo
 
-        !!!H01new 是([[2 3],[1,2]])的大块矩阵
+        ! !!!H01new 是([[2 3],[1,2]])的大块矩阵
         
-        do j = 1, omeganum
-            w=omega(j)
-            call surfgreen_1985(Ndim,w,GLL,GRR,GB,H00,H01,ones)
+        ! do j = 1, omeganum
+        !     w=omega(j)
+        !     call surfgreen_1985(Ndim,w,GLL,GRR,GB,H00,H01,ones)
             
-            do i= 1,num_wann
-                dos_l(ik, j)=dos_l(ik,j)- aimag(GLL(i,i))
-            enddo ! i
+        !     do i= 1,num_wann
+        !         dos_l(ik, j)=dos_l(ik,j)- aimag(GLL(i,i))
+        !     enddo ! i
             
-            do i= 1, num_wann
-                io= Ndim- num_wann+i
-                dos_r(ik, j)=dos_r(ik,j)- aimag(GRR(io,io))
-            enddo ! i
+        !     do i= 1, num_wann
+        !         io= Ndim- num_wann+i
+        !         dos_r(ik, j)=dos_r(ik,j)- aimag(GRR(io,io))
+        !     enddo ! i
             
-            do i= 1, Ndim
-                dos_bulk(ik, j)=dos_bulk(ik,j)- aimag(GB(i,i))
-            enddo ! i
+        !     do i= 1, Ndim
+        !         dos_bulk(ik, j)=dos_bulk(ik,j)- aimag(GB(i,i))
+        !     enddo ! i
   
-        enddo ! j
+        ! enddo ! j
 
 enddo
-call mpi_reduce(dos_l, dos_l_mpi, size(dos_l),MPI_DOUBLE_PRECISION,MPI_SUM,0,mpi_comm_world,ierr)
-call mpi_reduce(dos_r, dos_r_mpi, size(dos_r),MPI_DOUBLE_PRECISION,MPI_SUM,0,mpi_comm_world,ierr)
-call mpi_reduce(dos_bulk, dos_bulk_mpi, size(dos_bulk),MPI_DOUBLE_PRECISION,MPI_SUM,0,mpi_comm_world,ierr)
+! call mpi_reduce(dos_l, dos_l_mpi, size(dos_l),MPI_DOUBLE_PRECISION,MPI_SUM,0,mpi_comm_world,ierr)
+! call mpi_reduce(dos_r, dos_r_mpi, size(dos_r),MPI_DOUBLE_PRECISION,MPI_SUM,0,mpi_comm_world,ierr)
+! call mpi_reduce(dos_bulk, dos_bulk_mpi, size(dos_bulk),MPI_DOUBLE_PRECISION,MPI_SUM,0,mpi_comm_world,ierr)
 
-dos_l=log(abs(dos_l_mpi))
-dos_r=log(abs(dos_r_mpi))
-dos_bulk=log(abs(dos_bulk_mpi)+0.000000001)
+! dos_l=log(abs(dos_l_mpi))
+! dos_r=log(abs(dos_r_mpi))
+! dos_bulk=log(abs(dos_bulk_mpi)+0.000000001)
+
+
     if(irank.eq.0)then
         open(222,file='kpts.out',recl=10000)
         do ik=1,numkpts
