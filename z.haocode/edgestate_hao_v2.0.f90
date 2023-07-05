@@ -556,10 +556,12 @@ call MPI_Barrier(mpi_comm_world, ierr)
        
 
 
+    !  call MPI_Gather(eigvals, Hdim, MPI_DOUBLE_COMPLEX, gathered_data, Hdim, MPI_DOUBLE_COMPLEX, 0, MPI_COMM_WORLD, ierr)
 
-    !    eigvals_per_k(ik, :) = eigvals(:)
-       write(*,*) "ik eigvals", ik, eigvals(:)
-        write(*,*) "ik eigvals write done", "ik=",ik, "irank =" ,irank
+       eigvals_per_k(ik, :) = eigvals(:)
+       call MPI_ALLREDUCE(eigvals_per_k,eigvals_per_k_mpi,size(eigvals_per_k),MPI_DOUBLE_PRECISION,MPI_SUM,mpi_comm_world,ierr)
+    !    write(*,*) "ik eigvals", ik, eigvals(:)
+        ! write(*,*) "ik eigvals write done", "ik=",ik, "irank =" ,irank
     !    do i = 1, isize - 1
     !         call MPI_Recv(eigvals(:), Hdim, MPI_DOUBLE_COMPLEX, 0, i,MPI_COMM_WORLD, stt, ierr)
     !         eigvals_per_k(ik, :) = eigvals_per_k(ik, :) + eigvals(:)
@@ -583,7 +585,7 @@ enddo
        open(123,file='output_bands',recl=10000)
         do ib=1,Hdim
            do ik=1,numkpts
-                write(123,*), k(ik),eigvals_per_k(ik,ib)
+                write(123,*), k(ik),eigvals_per_k_mpi(ik,ib)
             enddo
         enddo
       close(123)  
