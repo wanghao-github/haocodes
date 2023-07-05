@@ -457,39 +457,40 @@ call MPI_Barrier(mpi_comm_world, ierr)
     !     endif
     ! call mpi_bcast(k,numkpts,MPI_DOUBLE_PRECISION,0,mpi_comm_world,ierr)    
     ! write(*,*)"noproblem_here3" ,irank  
-    ! ik_cpu = 0
-    ! do ik=1,numkpts
+    ik_cpu = 0
+    do ik=1,numkpts
   !  do ik= 1, 10
          !write(*,*) "mod(ik-1,isize)", mod(ik-1,isize)
            !call mpi_bcast(ik_cpu,1,MPI_INTEGER,0,mpi_comm_world,ierr)
-        !if(mod(ik_cpu-1,isize).ne.irank) cycle
-    !    ik_cpu=ik_cpu+1
+        ik_cpu=ik_cpu+1
+        if(mod(ik_cpu-1,isize).ne.irank) cycle
+       
      !   call MPI_Barrier(MPI_COMM_WORLD, ierr)
      !  write(*,*) "beforeik", ik, "beforeikcpu", ik_cpu,"irank",irank
         ! if (mod(ik_cpu-1,isize) /= irank) cycle
  !           write(*,*) "hello"
             !eigvals_per_k(ik,:)=0
 
-    do ik= 1+ irank, numkpts, isize
-        write(*,*) "k loop start ik=",ik, "irank=",irank
-        if (irank .eq. 0 .and. mod(ik/isize, 1) .eq. 0) then
-         call now(time_end) 
-          write(*, '(a, i18, "/", i18, a, f10.2, "s")') 'ik/knv3', &
-           ik, numkpts, '  time left', (numkpts-ik)*(time_end-time_start)/isize
-           time_start= time_end
-        endif
+    ! do ik= 1+ irank, numkpts, isize
+    !     write(*,*) "k loop start ik=",ik, "irank=",irank
+    !     if (irank .eq. 0 .and. mod(ik/isize, 1) .eq. 0) then
+    !      call now(time_end) 
+    !       write(*, '(a, i18, "/", i18, a, f10.2, "s")') 'ik/knv3', &
+    !        ik, numkpts, '  time left', (numkpts-ik)*(time_end-time_start)/isize
+    !        time_start= time_end
+    !     endif
             fourHamilton=0d0
-            write(*,*) "before  fourHam irank=",irank
-            write(*,*) "num_wann=",num_wann,"rvecnum =",rvecnum
+            ! write(*,*) "before  fourHam irank=",irank
+            ! write(*,*) "num_wann=",num_wann,"rvecnum =",rvecnum
             do ii=1,rvecnum   
                 do i=1,num_wann
-                    write(*,*) "i=",i
+                    ! write(*,*) "i=",i
                     do j=1,num_wann
-                        write(*,*) "j=",j
+                        ! write(*,*) "j=",j
                         phase=0d0
-                        write(*,*) "phase=",phase
+                        ! write(*,*) "phase=",phase
                         do i1=1,fourdim
-                            write(*,*) "fourdim=",fourdim
+                            ! write(*,*) "fourdim=",fourdim
                             ! write(*,*) ii,i,j,fourdir(i1)
                             fourdirection=fourdir(i1)
                             phase=phase+(irvec(fourdirection,ii))*k(ik)
@@ -522,7 +523,7 @@ call MPI_Barrier(mpi_comm_world, ierr)
      write(*,*) "zheevx no problem, irank =" ,irank
     !    do ib=1,Hdim
     !    write(*,*) "eigvals_per_k(ik,1)",eigvals(1)
-            eigvals_per_k(ik,:) = eigvals(:)
+            ! eigvals_per_k(ik,:) = eigvals(:)
     !    enddo
  !    call mpi_barrier(mpi_comm_world,ierr)
     if (irank /= 0) then
@@ -530,7 +531,7 @@ call MPI_Barrier(mpi_comm_world, ierr)
     else
        eigvals_per_k(ik, :) = eigvals(:)
        do i = 1, isize - 1
-            call MPI_Recv(eigvals(:), Hdim, MPI_DOUBLE_COMPLEX, i, i,MPI_COMM_WORLD, MPI_STATUS_IGNORE, ierr)
+            call MPI_Recv(eigvals(:), Hdim, MPI_DOUBLE_COMPLEX, i, i,MPI_COMM_WORLD, stt, ierr)
             eigvals_per_k(ik, :) = eigvals_per_k(ik, :) + eigvals(:)
        end do
    end if     
