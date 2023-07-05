@@ -41,7 +41,7 @@ program hao_edgestates
 
     abstol=2.0*tiny(abstol)
     pi = 3.14159265
-    numkpts = 1280
+    ! numkpts = 1280
  
     if(irank.eq.0)then
         write(*,*) "isize=", isize
@@ -83,7 +83,7 @@ program hao_edgestates
 
     call mpi_bcast(num_wann,1,MPI_INTEGER,0,mpi_comm_world,ierr)
     call mpi_bcast(rvecnum,1,MPI_INTEGER,0,mpi_comm_world,ierr)
-    call mpi_bcast(numkpts,1,MPI_INTEGER,0,mpi_comm_world,ierr)
+
 
     if(.not.allocated(irvec)) then 
         allocate(irvec(3,rvecnum))
@@ -99,6 +99,7 @@ program hao_edgestates
     if(irank == 0)then
         write(*,*) "irank=", irank
         open(100,file='layer_inp')
+        read(100,*) numkpts
         read(100,*) numberlayer
         allocate(atomnumberarray(num_wann))
         read(100,*)	ndiffatom
@@ -175,7 +176,8 @@ program hao_edgestates
         write(*,*) "layerdir" ,layerdir
     endif
 
-
+    call mpi_bcast(numkpts,1,MPI_INTEGER,0,mpi_comm_world,ierr)
+    
     if(.not.allocated(nrpts))then 
         allocate(nrpts(rvecnum))
     endif
