@@ -18,7 +18,7 @@ program hao_edgestates
     integer              :: ndiffatom,nexcludeup,nexcludedown,return_num_wann,locmin,locmax,i1,i2
     real                 :: vl,vu,abstol,ik1,time_start,time_end
     integer              :: length,length1,length2,length3,length4,length5
-    real,allocatable     :: eigvals(:),eigvals_per_k(:,:),temp_array
+    real,allocatable     :: eigvals(:),eigvals_per_k(:,:),temp_array(:)
     complex,allocatable  :: eigvecs(:,:)
     integer              :: ne,info,lwork,ik_cpu
     complex,allocatable  :: work(:)
