@@ -1,6 +1,5 @@
 program hao_edgestates
     !Hao Wang rewrite the legacy code for the calculation of edgestate in Juelich Forchungsentrum, 2022/10/27
-    !  
     !mpiifort -CB -r8 -qmkl edgestate_hao.f90 -o edge_states_hao.x
     !  mpiifort -CB -r8 edgestate_hao.f90   -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread -o edge_states_hao.x
     implicit none
@@ -158,9 +157,6 @@ program hao_edgestates
         allocate(fourdir(fourdim))
         read(100,'(I3,<fourdim>I3)')            layerdir,fourdir(:) 
         close(100)
-        ! deallocate(fourdir)
-        ! write(*,*) "input_read OK"
-        ! write(*,*) "fourdir" , fourdir
     endif
 
     allocate(nrpts(rvecnum))
@@ -202,12 +198,8 @@ program hao_edgestates
     call mpi_bcast(fourdir,fourdim,MPI_INTEGER,0,mpi_comm_world,ierr)
     write(*,*) "fourdir=",fourdir,irank 
 
-   
-
     call mpi_bcast(layerdir,1,MPI_INTEGER,0,mpi_comm_world,ierr)
     write(*,*) "layerdir =",layerdir,irank 
-
-    ! call MPI_Barrier(mpi_comm_world, ierr)
 
     if(irank.eq.0)then
         write(*,*) "irank=", irank
@@ -320,42 +312,11 @@ program hao_edgestates
         write(*,*)"here is no problem"
     endif
 
-
     call mpi_bcast(Hdim,1,MPI_INTEGER,0,mpi_comm_world,ierr)
     call mpi_bcast(return_num_wann,1,MPI_INTEGER,0,mpi_comm_world,ierr)
     write(*,*)"here is no problem2132131"
 call MPI_Barrier(mpi_comm_world, ierr)
-! 进程0发送Hdim的值给其他进程
-    ! if (irank == 0) then
-    !     write(*,*) "start send message"
-    !     do i = 1, isize-1
-    !         write(*,*) "i = ",i
-    !         ! call MPI_Send(Hdim, 1, MPI_INTEGER, i, 0, mpi_comm_world, ierr)
-    !     end do
-    ! ! else
-    ! !     call MPI_Recv(Hdim, 1, MPI_INTEGER, 0, 0, mpi_comm_world, stt, ierr)
-    ! end if
-    
-    ! ! 所有进程在此处等待，直到所有进程都接收到了Hdim的值
-    ! call MPI_Barrier(mpi_comm_world, ierr)
-    
-    ! ! 广播layerintarr的内容
-    ! call MPI_Bcast(layerintarr, Hdim, MPI_INTEGER, 0, mpi_comm_world, ierr)    
 
-
-! ! 发送Hdim的值
-!     call MPI_Isend(Hdim, 1, MPI_INTEGER, 0, 0, mpi_comm_world, request, ierr)
-
-!     ! 接收Hdim的值
-!     call MPI_Irecv(Hdim, 1, MPI_INTEGER, 0, 0, mpi_comm_world, request, ierr)
-    
-!     ! 等待通信完成
-!     call MPI_Wait(request, status, ierr)
-    
-!     ! 广播layerintarr的内容
-!     call MPI_Bcast(layerintarr, Hdim, MPI_INTEGER, 0, mpi_comm_world, ierr)
-    
-    ! if(.not.allocated(eigvals_per_k))then 
         allocate(eigvals_per_k(numkpts,Hdim))
         allocate(eigvals_per_k_mpi(numkpts,Hdim))
     ! endif
@@ -366,19 +327,6 @@ call MPI_Barrier(mpi_comm_world, ierr)
         write(*,*)"here is no problem1"
     endif
 
-    ! call mpi_bcast(layerintarr,Hdim,MPI_INTEGER,0,mpi_comm_world,ierr)
-    
-    
-    
-    ! call mpi_bcast(nexcludeup,size(nexcludeup),MPI_INTEGER,0,mpi_comm_world,ierr)
-    ! call mpi_bcast(nexcludedown,size(nexcludedown),MPI_INTEGER,0,mpi_comm_world,ierr)
-    ! call mpi_bcast(nwannexup,1,MPI_INTEGER,0,mpi_comm_world,ierr)
-    ! call mpi_bcast(nwannexdown,1,MPI_INTEGER,0,mpi_comm_world,ierr)
-
-    
-    
-
-    
     if(.not.allocated(atomarr))then 
         allocate(atomarr(ndiffatom))
     endif
@@ -430,79 +378,31 @@ call MPI_Barrier(mpi_comm_world, ierr)
             write(*,*)"here is no problem7"
           endif
 
-
-        ! if(.not.allocated(fourHamilton))then 
-            allocate(fourHamilton(layerspreadmin:layerspreadmax,num_wann,num_wann))
-        ! endif
-        ! call mpi_bcast(fourHamilton,size(fourHamilton),MPI_DOUBLE_PRECISION,0,mpi_comm_world,ierr)
-
-
-        ! if(.not.allocated(hamiltonian))then 
-            allocate(hamiltonian(Hdim,Hdim))
-        ! endif
-        ! call mpi_bcast(hamiltonian,size(hamiltonian),MPI_DOUBLE_PRECISION,0,mpi_comm_world,ierr)
-
-
-        ! if (irank.eq.0) then    
-        !     write(*,*)"here is no problem8"
-        !     write(*,*),wannierfunctioninham
-        !   endif
+        allocate(fourHamilton(layerspreadmin:layerspreadmax,num_wann,num_wann))
+        allocate(hamiltonian(Hdim,Hdim))
         
         if(.not.allocated(wannierfunctioninham))then 
             allocate(wannierfunctioninham(Hdim))
         endif
         call mpi_bcast(wannierfunctioninham,Hdim,MPI_INTEGER,0,mpi_comm_world,ierr)
-  
-        if (irank.eq.0) then    
-            write(*,*)"here is no problem12"
-        endif
 
-    ! if(irank.eq.0)then 
         do ik=1,numkpts
             k(ik) = ik*3*pi/numkpts
         enddo
-    ! endif
+
+
         call mpi_barrier(mpi_comm_world,ierr)
-    ! if(.not.allocated(k))then 
-    !         allocate(k(numkpts))
-    !     endif
-    ! call mpi_bcast(k,numkpts,MPI_DOUBLE_PRECISION,0,mpi_comm_world,ierr)    
-    ! write(*,*)"noproblem_here3" ,irank  
+
     ik_cpu = 0
     do ik=1,numkpts
-  !  do ik= 1, 10
-         !write(*,*) "mod(ik-1,isize)", mod(ik-1,isize)
-           !call mpi_bcast(ik_cpu,1,MPI_INTEGER,0,mpi_comm_world,ierr)
         ik_cpu=ik_cpu+1
         if(mod(ik_cpu-1,isize).ne.irank) cycle
-       
-     !   call MPI_Barrier(MPI_COMM_WORLD, ierr)
-     !  write(*,*) "beforeik", ik, "beforeikcpu", ik_cpu,"irank",irank
-        ! if (mod(ik_cpu-1,isize) /= irank) cycle
- !           write(*,*) "hello"
-            !eigvals_per_k(ik,:)=0
-
-    ! do ik= 1+ irank, numkpts, isize
-    !     write(*,*) "k loop start ik=",ik, "irank=",irank
-    !     if (irank .eq. 0 .and. mod(ik/isize, 1) .eq. 0) then
-    !      call now(time_end) 
-    !       write(*, '(a, i18, "/", i18, a, f10.2, "s")') 'ik/knv3', &
-    !        ik, numkpts, '  time left', (numkpts-ik)*(time_end-time_start)/isize
-    !        time_start= time_end
-    !     endif
             fourHamilton=0d0
-            ! write(*,*) "before  fourHam irank=",irank
-            ! write(*,*) "num_wann=",num_wann,"rvecnum =",rvecnum
             do ii=1,rvecnum   
                 do i=1,num_wann
-                    ! write(*,*) "i=",i
                     do j=1,num_wann
-                        ! write(*,*) "j=",j
                         phase=0d0
-                        ! write(*,*) "phase=",phase
                         do i1=1,fourdim
-                            ! write(*,*) "fourdim=",fourdim
-                            ! write(*,*) ii,i,j,fourdir(i1)
                             fourdirection=fourdir(i1)
                             phase=phase+(irvec(fourdirection,ii))*k(ik)
                         enddo
@@ -511,9 +411,7 @@ call MPI_Barrier(mpi_comm_world, ierr)
                     enddo       
                 enddo 
             enddo
-        ! if(irank.eq.0)then
-         write(*,*) "fourHam no problem irank=",irank
-        ! endif
+        write(*,*) "fourHam no problem irank=",irank
         hamiltonian=cmplx(0d0,0d0)
         do i=1,Hdim
             do j=1,Hdim
@@ -525,50 +423,18 @@ call MPI_Barrier(mpi_comm_world, ierr)
                 endif
             enddo
         enddo
-  
+
         write(*,*) "Ham no problem, irank =" ,irank
 
-      
      call zheevx('V','A','U',Hdim,hamiltonian,Hdim,vl,vu,1,Hdim,abstol,ne,eigvals,eigvecs,Hdim,work,lwork,rwork,iwork, ifail,info)
        !对角化这个超胞哈密顿量
      write(*,*) "zheevx no problem, irank =" ,irank
-    !    do ib=1,Hdim
-    !    write(*,*) "eigvals_per_k(ik,1)",eigvals(1)
-            ! eigvals_per_k(ik,:) = eigvals(:)
-    !    enddo
-    !  call mpi_barrier(mpi_comm_world,ierr)
-    !  call MPI_Barrier(MPI_COMM_WORLD, ierr)
-    ! if (irank /= 0) then
-    !    call MPI_Send(eigvals(:), Hdim, MPI_DOUBLE_COMPLEX, 0, irank, MPI_COMM_WORLD, ierr)
-    ! else
-    
-         ! 将部分结果存储到临时数组
-        !  eigvals_per_k(ik,:) = eigvals(:)
-         ! 在所有CPU上进行归约操作
-
-         ! 确定每个CPU发送的数据量
-        !  sendcount = Hdim
-     
-         ! 收集每个CPU的结果到最终矩阵
-         !call MPI_Gather(temp_array, sendcount, MPI_DOUBLE_COMPLEX, eigvals_per_k(ik, :), sendcount, MPI_DOUBLE_COMPLEX, 0, MPI_COMM_WORLD, ierr)
-    !  end do
-     
-       
-
-
-    !  call MPI_Gather(eigvals, Hdim, MPI_DOUBLE_COMPLEX, gathered_data, Hdim, MPI_DOUBLE_COMPLEX, 0, MPI_COMM_WORLD, ierr)
 
        eigvals_per_k(ik, :) = eigvals(:)
        call MPI_ALLREDUCE(eigvals_per_k,eigvals_per_k_mpi,size(eigvals_per_k),MPI_DOUBLE_PRECISION,MPI_SUM,mpi_comm_world,ierr)
-    !    write(*,*) "ik eigvals", ik, eigvals(:)
-        ! write(*,*) "ik eigvals write done", "ik=",ik, "irank =" ,irank
-    !    do i = 1, isize - 1
-    !         call MPI_Recv(eigvals(:), Hdim, MPI_DOUBLE_COMPLEX, 0, i,MPI_COMM_WORLD, stt, ierr)
-    !         eigvals_per_k(ik, :) = eigvals_per_k(ik, :) + eigvals(:)
-    !    end do
-!    end if     
+
 enddo
-! call MPI_REDUCE(eigvals_per_k(:,:),eigvals_per_k_mpi(:,:),size(eigvals_per_k),MPI_DOUBLE_PRECISION,MPI_SUM,0,mpi_comm_world,ierr)
+
     if(irank.eq.0)then
         open(222,file='kpts.out',recl=10000)
         do ik=1,numkpts
@@ -590,8 +456,8 @@ enddo
         enddo
       close(123)  
     !  enddo
-   endif
- !   write(*,*) "size of hamiltonian", size(hamiltonian)
+    endif
+
     call mpi_barrier(mpi_comm_world,ierr)
     call MPI_Finalize(ierr)
 end program hao_edgestates
