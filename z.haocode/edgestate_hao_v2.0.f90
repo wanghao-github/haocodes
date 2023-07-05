@@ -473,3 +473,134 @@ subroutine now(time_now)
               time_new(6)*60+time_new(7)+time_new(8)/1000d0  
     return
  end subroutine now
+
+ subroutine surfgreen_1985(omega,GLL,GRR,GB,H00,H01,ones)
+    use para
+    implicit none
+
+    ! inout variables     
+    ! the factor 2 is induced by spin
+    ! energy hbar omega
+    real(Dp),intent(in) :: omega  
+
+    ! H00 Hamiltonian between nearest neighbour-quintuple-layers
+    complex(Dp),intent(in) :: H00(Ndim,Ndim)
+
+    ! H01 Hamiltonian between next-nearest neighbour-quintuple-layers
+    complex(Dp),intent(in) :: H01(Ndim,Ndim)
+
+    ! temp hamiltonian
+
+    complex(Dp),intent(in)   :: ones(Ndim,Ndim)
+
+    ! surface green function
+    complex(Dp),intent(inout)  :: GLL(Ndim,Ndim)
+    complex(Dp),intent(inout)  :: GRR(Ndim,Ndim)
+
+    !> bulk green's function
+    complex(Dp),intent(inout)  :: GB(Ndim,Ndim)
+
+    ! >> local variables
+    ! iteration number
+    integer :: iter
+
+    ! maximun iteration 
+    integer ,parameter:: itermax=100
+
+    ! accuracy control
+    real(Dp) :: accuracy=1e-16
+
+    ! a real type temp variable
+    real(Dp) :: real_temp
+
+    ! omegac=omega(i)+I * eta
+    complex(Dp) :: omegac 
+
+
+    ! some variables in Eq.(11)
+    complex(Dp), allocatable :: alphai(:, :) 
+    complex(Dp), allocatable :: betai(:, :) 
+    complex(Dp), allocatable :: epsiloni(:, :) 
+    complex(Dp), allocatable :: epsilons(:, :) 
+    complex(Dp), allocatable :: epsilons_t(:, :) 
+
+    complex(Dp), allocatable :: mat1 (:, :) 
+    complex(Dp), allocatable :: mat2 (:, :) 
+
+    ! g0= inv(w-e_i)
+    complex(Dp), allocatable :: g0 (:, :) 
+
+    ! allocate some variables
+    allocate(alphai(Ndim, Ndim)) 
+    allocate(betai (Ndim, Ndim)) 
+    allocate(epsiloni (Ndim, Ndim)) 
+    allocate(epsilons (Ndim, Ndim)) 
+    allocate(epsilons_t(Ndim, Ndim)) 
+    allocate(mat1(Ndim, Ndim)) 
+    allocate(mat2(Ndim, Ndim)) 
+    allocate(g0(Ndim, Ndim)) 
+
+    epsiloni= H00
+    epsilons= H00
+    epsilons_t= H00
+    alphai  = H01
+    betai   = conjg(transpose(H01))
+   !print *, sqrt(sum(abs(H00)**2)), 'H00'
+
+    ! w+i*0^+
+    omegac= dcmplx(omega, eta)
+   !print *, omegac
+
+    ! begin iteration
+    do iter=1, itermax
+
+       g0= omegac*ones- epsiloni
+       call inv(Ndim, g0)
+
+       ! a_i-1*(w-e_i-1)^-1
+       call mat_mul(Ndim, alphai, g0, mat1 )
+       
+       ! b_i-1*(w-e_i-1)^-1
+       call mat_mul(Ndim, betai, g0, mat2 )
+
+       ! a_i-1*(w-e_i-1)^-1*b_i-1
+       call mat_mul(Ndim, mat1, betai, g0)
+       epsiloni= epsiloni+ g0
+      !print *, sqrt(sum(abs(epsiloni)**2)), 'ei'
+       ! es_i= es_i-1 + a_i-1*(w-e_i-1)^-1*b_i-1
+       epsilons= epsilons+ g0
+      !print *, sqrt(sum(abs(epsilons)**2)), 'es'
+      !pause
+
+       ! b_i-1*(w-e_i-1)^-1*a_i-1
+       call mat_mul(Ndim, mat2, alphai, g0)
+       epsiloni= epsiloni+ g0
+       ! es_i= es_i-1 + a_i-1*(w-e_i-1)^-1*b_i-1
+       epsilons_t= epsilons_t+ g0
+
+       ! a_i= a_i-1*(w-e_i-1)^-1*a_i-1 
+       call mat_mul(Ndim, mat1, alphai, g0)
+       alphai= g0
+       ! b_i= b_i-1*(w-e_i-1)^-1*b_i-1 
+       call mat_mul(Ndim, mat2, betai, g0)
+       betai= g0
+
+      !real_temp=maxval(abs(alphai))   
+       real_temp=sum(abs(alphai))   
+      !if (cpuid.eq.0) print *, iter, real_temp
+       if (real_temp.le.accuracy) exit
+
+    enddo ! end of iteration
+
+    ! calculate surface green's function
+    GLL= omegac*ones- epsilons
+    call inv(Ndim, GLL)
+
+    GRR= omegac*ones- epsilons_t
+    call inv(Ndim, GRR)
+
+    GB = omegac*ones- epsiloni
+    call inv(Ndim, GB)
+
+    return
+ end subroutine surfgreen_1985
