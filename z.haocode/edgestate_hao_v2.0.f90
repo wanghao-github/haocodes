@@ -18,7 +18,7 @@ program hao_edgestates
     integer              :: ndiffatom,nexcludeup,nexcludedown,return_num_wann,locmin,locmax,i1,i2
     real                 :: vl,vu,abstol,ik1,time_start,time_end
     integer              :: length,length1,length2,length3,length4,length5
-    real,allocatable     :: eigvals(:),eigvals_per_k(:,:),temp_array(:)
+    real,allocatable     :: eigvals(:),eigvals_per_k(:,:),temp_array(:),eigvals_per_k_mpi(:,:) 
     complex,allocatable  :: eigvecs(:,:)
     integer              :: ne,info,lwork,ik_cpu
     complex,allocatable  :: work(:)
@@ -357,10 +357,11 @@ call MPI_Barrier(mpi_comm_world, ierr)
     
     ! if(.not.allocated(eigvals_per_k))then 
         allocate(eigvals_per_k(numkpts,Hdim))
+        allocate(eigvals_per_k_mpi(numkpts,Hdim))
     ! endif
     ! call mpi_bcast(eigvals_per_k,size(eigvals_per_k),MPI_DOUBLE_PRECISION,0,mpi_comm_world,ierr)   
     eigvals_per_k=0.0
-   
+    eigvals_per_k_mpi=0.0
     if (irank.eq.0) then
         write(*,*)"here is no problem1"
     endif
@@ -542,16 +543,14 @@ call MPI_Barrier(mpi_comm_world, ierr)
     ! else
     
          ! 将部分结果存储到临时数组
-         temp_array = eigvals(:)
-     
+         eigvals_per_k(ik,:) = eigvals(:)
          ! 在所有CPU上进行归约操作
-         call MPI_Allreduce(MPI_IN_PLACE, temp_array, Hdim, MPI_DOUBLE_COMPLEX, MPI_SUM, MPI_COMM_WORLD, ierr)
-     
+         call MPI_REDUCE(eigvals_per_k(:,:),eigvals_per_k_mpi(:,:),size(eigvals_per_k),MPI_DOUBLE_PRECISION,MPI_SUM,0,mpi_comm_world,ierr)
          ! 确定每个CPU发送的数据量
-         sendcount = Hdim
+        !  sendcount = Hdim
      
          ! 收集每个CPU的结果到最终矩阵
-         call MPI_Gather(temp_array, sendcount, MPI_DOUBLE_COMPLEX, eigvals_per_k(ik, :), sendcount, MPI_DOUBLE_COMPLEX, 0, MPI_COMM_WORLD, ierr)
+         !call MPI_Gather(temp_array, sendcount, MPI_DOUBLE_COMPLEX, eigvals_per_k(ik, :), sendcount, MPI_DOUBLE_COMPLEX, 0, MPI_COMM_WORLD, ierr)
     !  end do
      
        
