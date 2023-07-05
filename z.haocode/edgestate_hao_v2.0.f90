@@ -4,8 +4,8 @@ program hao_edgestates
     !  mpiifort -CB -r8 edgestate_hao.f90   -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread -o edge_states_hao.x
     implicit none
 
-    integer              :: nwannexup,nwannexdown,ix,iy,iz,band1,band2,rvecnum,nslab1,nslab2,ii,zvalue,ib,sendcount
-    real                 :: fermi,rdum,idum,pi,phase,lattice_vec(3,3)
+    integer              :: nwannexup,nwannexdown,ix,iy,iz,band1,band2,rvecnum,nslab1,nslab2,ii,zvalue,ib,sendcount,Np,ijmax,Ndim,io
+    real                 :: fermi,rdum,idum,pi,phase,lattice_vec(3,3),w
     integer,allocatable  :: nrpts(:),irvec(:,:)
     complex,allocatable  :: hops(:,:,:),ham(:,:),fourHamilton(:,:,:),hamiltonian(:,:)
     real,allocatable     :: k(:),localisationpar(:)
@@ -17,13 +17,33 @@ program hao_edgestates
     integer              :: ndiffatom,nexcludeup,nexcludedown,return_num_wann,locmin,locmax,i1,i2
     real                 :: vl,vu,abstol,ik1,time_start,time_end
     integer              :: length,length1,length2,length3,length4,length5
-    real,allocatable     :: eigvals(:),eigvals_per_k(:,:),temp_array(:),eigvals_per_k_mpi(:,:) 
+    real,allocatable     :: eigvals(:),eigvals_per_k(:,:),temp_array(:),eigvals_per_k_mpi(:,:),ones(:)
     complex,allocatable  :: eigvecs(:,:)
-    integer              :: ne,info,lwork,ik_cpu
+    integer              :: ne,info,lwork,ik_cpu,omeganum
     complex,allocatable  :: work(:)
     integer,allocatable  :: iwork(:)
     real,allocatable     :: rwork(:)
     integer,allocatable  :: ifail(:)
+
+    real(kind(1.0d0)), allocatable :: omega(:)
+    real(kind(1.0d0)), allocatable :: dos_l(:,:)
+    real(kind(1.0d0)), allocatable :: dos_r(:,:)
+    real(kind(1.0d0)), allocatable :: dos_l_only(:,:)
+    real(kind(1.0d0)), allocatable :: dos_r_only(:,:)
+    real(kind(1.0d0)), allocatable :: dos_l_mpi(:,:)
+    real(kind(1.0d0)), allocatable :: dos_r_mpi(:,:)
+    real(kind(1.0d0)), allocatable :: dos_bulk(:,:)
+    real(kind(1.0d0)), allocatable :: dos_bulk_mpi(:,:)
+
+    complex(kind(1.0d0)), allocatable :: GLL(:,:)
+    complex(kind(1.0d0)), allocatable :: GRR(:,:)
+    complex(kind(1.0d0)), allocatable :: GB (:,:)
+    complex(kind(1.0d0)), allocatable :: H00(:,:)
+    complex(kind(1.0d0)), allocatable :: H01(:,:)
+    complex(kind(1.0d0)), allocatable :: ones(:,:)
+
+
+
 
     type                 :: atom
     integer              :: number
@@ -41,8 +61,12 @@ program hao_edgestates
 
     abstol=2.0*tiny(abstol)
     pi = 3.14159265
+    Np = 2
+    ijmax = 10
     ! numkpts = 1280
- 
+    omeganum= 300
+
+
     if(irank.eq.0)then
         write(*,*) "isize=", isize
         open(200,file='hopping.1')
@@ -83,6 +107,8 @@ program hao_edgestates
 
     call mpi_bcast(num_wann,1,MPI_INTEGER,0,mpi_comm_world,ierr)
     call mpi_bcast(rvecnum,1,MPI_INTEGER,0,mpi_comm_world,ierr)
+
+    Ndim = Np*num_wann
 
 
     if(.not.allocated(irvec)) then 
@@ -374,15 +400,29 @@ call MPI_Barrier(mpi_comm_world, ierr)
         allocate(iwork(5*Hdim) )
         allocate(ifail(Hdim) )
         allocate(k(numkpts))
+        allocate(omega(omeganum))
+        allocate(ones(Ndim))
+        allocate(GLL(Ndim, Ndim))
+        allocate(GRR(Ndim, Ndim))
+        allocate(GB (Ndim, Ndim))
+        allocate(H00(Ndim, Ndim))
+        allocate(H01(Ndim, Ndim))
+
+        GLL= 0d0
+        GRR= 0d0
+        GB = 0d0
+        H00= 0d0
+        H01= 0d0
+        ones= 0d0
         k=0.0
 
         if (irank.eq.0) then    
             write(*,*)"here is no problem7"
-          endif
+        endif
 
         allocate(fourHamilton(layerspreadmin:layerspreadmax,num_wann,num_wann))
         allocate(hamiltonian(Hdim,Hdim))
-        
+
         if(.not.allocated(wannierfunctioninham))then 
             allocate(wannierfunctioninham(Hdim))
         endif
@@ -390,6 +430,14 @@ call MPI_Barrier(mpi_comm_world, ierr)
 
         do ik=1,numkpts
             k(ik) = ik*3*pi/numkpts
+        enddo
+
+        do i= 1, omeganum
+            omega(i)=-2+(i-1)*(2-(-2)))/dble(omeganum)
+        enddo
+        
+        do i=1,Ndim
+            ones(i,i)=1.0d0
         enddo
 
 
@@ -435,8 +483,59 @@ call MPI_Barrier(mpi_comm_world, ierr)
        eigvals_per_k(ik, :) = eigvals(:)
        call MPI_ALLREDUCE(eigvals_per_k,eigvals_per_k_mpi,size(eigvals_per_k),MPI_DOUBLE_PRECISION,MPI_SUM,mpi_comm_world,ierr)
 
-enddo
+       write(*,*) "write eigvals OK, irank =" ,irank
 
+       !!!!接下来抄的WT的
+        H00=0.0d0   !!!定义H00 和H01
+        H01=0.0d0
+        do i=1,Np
+            do j=1,Np
+                if (abs(i-j).le.(ijmax)) then
+                    H00(num_wann*(i-1)+1:num_wann*i,num_wann*(j-1)+1:num_wann*j)=fourHamilton(j-i,i,j)
+                    !!!这个是([[0 1],[-1,0]])的大块矩阵
+                endif
+            enddo
+        enddo
+
+
+        !!! H01new
+        do i=1,Np
+            do j=Np+1,Np*2
+                if (j-i.le.ijmax) then
+                    H01(num_wann*(i-1)+1:num_wann*i,num_wann*(j-1-Np)+1:num_wann*(j-Np))=fourHamilton(j-i,i,j)
+                endif
+            enddo
+        enddo
+
+        !!!H01new 是([[2 3],[1,2]])的大块矩阵
+        
+        do j = 1, omeganum
+            w=omega(j)
+            call surfgreen_1985(w,GLL,GRR,GB,H00,H01,ones)
+            
+            do i= 1,num_wann
+                dos_l(ik, j)=dos_l(ik,j)- aimag(GLL(i,i))
+            enddo ! i
+            
+            do i= 1, num_wann
+                io= Ndim- num_wann+i
+                dos_r(ik, j)=dos_r(ik,j)- aimag(GRR(io,io))
+            enddo ! i
+            
+            do i= 1, Ndim
+                dos_bulk(ik, j)=dos_bulk(ik,j)- aimag(GB(i,i))
+            enddo ! i
+  
+        enddo ! j
+
+enddo
+call mpi_reduce(dos_l, dos_l_mpi, size(dos_l),MPI_DOUBLE_PRECISION,MPI_SUM,0,mpi_comm_world,ierr)
+call mpi_reduce(dos_r, dos_r_mpi, size(dos_r),MPI_DOUBLE_PRECISION,MPI_SUM,0,mpi_comm_world,ierr)
+call mpi_reduce(dos_bulk, dos_bulk_mpi, size(dos_bulk),MPI_DOUBLE_PRECISION,MPI_SUM,0,mpi_comm_world,ierr)
+
+dos_l=log(abs(dos_l_mpi))
+dos_r=log(abs(dos_r_mpi))
+dos_bulk=log(abs(dos_bulk_mpi)+eps9)
     if(irank.eq.0)then
         open(222,file='kpts.out',recl=10000)
         do ik=1,numkpts
@@ -475,30 +574,29 @@ subroutine now(time_now)
  end subroutine now
 
  subroutine surfgreen_1985(omega,GLL,GRR,GB,H00,H01,ones)
-    use para
     implicit none
 
     ! inout variables     
     ! the factor 2 is induced by spin
     ! energy hbar omega
-    real(Dp),intent(in) :: omega  
+    real(kind(1.0d0)),intent(in) :: omega  
 
     ! H00 Hamiltonian between nearest neighbour-quintuple-layers
-    complex(Dp),intent(in) :: H00(Ndim,Ndim)
+    complex(kind(1.0d0)),intent(in) :: H00(Ndim,Ndim)
 
     ! H01 Hamiltonian between next-nearest neighbour-quintuple-layers
-    complex(Dp),intent(in) :: H01(Ndim,Ndim)
+    complex(kind(1.0d0)),intent(in) :: H01(Ndim,Ndim)
 
     ! temp hamiltonian
 
-    complex(Dp),intent(in)   :: ones(Ndim,Ndim)
+    complex(kind(1.0d0)),intent(in)   :: ones(Ndim,Ndim)
 
     ! surface green function
-    complex(Dp),intent(inout)  :: GLL(Ndim,Ndim)
-    complex(Dp),intent(inout)  :: GRR(Ndim,Ndim)
+    complex(kind(1.0d0)),intent(inout)  :: GLL(Ndim,Ndim)
+    complex(kind(1.0d0)),intent(inout)  :: GRR(Ndim,Ndim)
 
     !> bulk green's function
-    complex(Dp),intent(inout)  :: GB(Ndim,Ndim)
+    complex(kind(1.0d0)),intent(inout)  :: GB(Ndim,Ndim)
 
     ! >> local variables
     ! iteration number
@@ -508,27 +606,27 @@ subroutine now(time_now)
     integer ,parameter:: itermax=100
 
     ! accuracy control
-    real(Dp) :: accuracy=1e-16
+    real(kind(1.0d0)) :: accuracy=1e-16
 
     ! a real type temp variable
-    real(Dp) :: real_temp
+    real(kind(1.0d0)) :: real_temp
 
     ! omegac=omega(i)+I * eta
-    complex(Dp) :: omegac 
+    complex(kind(1.0d0)) :: omegac 
 
 
     ! some variables in Eq.(11)
-    complex(Dp), allocatable :: alphai(:, :) 
-    complex(Dp), allocatable :: betai(:, :) 
-    complex(Dp), allocatable :: epsiloni(:, :) 
-    complex(Dp), allocatable :: epsilons(:, :) 
-    complex(Dp), allocatable :: epsilons_t(:, :) 
+    complex(kind(1.0d0)), allocatable :: alphai(:, :) 
+    complex(kind(1.0d0)), allocatable :: betai(:, :) 
+    complex(kind(1.0d0)), allocatable :: epsiloni(:, :) 
+    complex(kind(1.0d0)), allocatable :: epsilons(:, :) 
+    complex(kind(1.0d0)), allocatable :: epsilons_t(:, :) 
 
-    complex(Dp), allocatable :: mat1 (:, :) 
-    complex(Dp), allocatable :: mat2 (:, :) 
+    complex(kind(1.0d0)), allocatable :: mat1 (:, :) 
+    complex(kind(1.0d0)), allocatable :: mat2 (:, :) 
 
     ! g0= inv(w-e_i)
-    complex(Dp), allocatable :: g0 (:, :) 
+    complex(kind(1.0d0)), allocatable :: g0 (:, :) 
 
     ! allocate some variables
     allocate(alphai(Ndim, Ndim)) 
@@ -604,3 +702,62 @@ subroutine now(time_now)
 
     return
  end subroutine surfgreen_1985
+
+
+
+subroutine inv(ndim,Amat)
+
+    implicit none
+
+    integer,parameter :: dp=8
+    integer           :: i
+    integer           :: info
+    integer,intent(in):: ndim
+    integer,allocatable   :: ipiv(:)
+    complex(kind(1.0d0)),parameter :: zone=(1.0d0,0.0d0)
+    complex(kind(1.0d0)),intent(inout):: Amat(ndim,ndim)
+    complex(kind(1.0d0)),allocatable :: Bmat(:,:)
+
+    allocate(ipiv(ndim))
+    allocate(Bmat(ndim,ndim))
+
+    ipiv=0
+
+    Bmat= (0d0, 0d0)
+    do i=1,ndim
+       Bmat(i,i)= zone
+    enddo
+
+    call zgesv(ndim,ndim,Amat,ndim,ipiv,Bmat,ndim,info)
+
+    if(info.ne.0)print *,'something wrong with zgesv'
+
+    Amat=Bmat
+    
+    return
+
+end subroutine inv 
+
+
+
+subroutine mat_mul(nmatdim,A,B,C)
+      
+    implicit none
+    
+    integer,intent(in) :: nmatdim    
+    complex(kind(1.0d0)) :: ALPHA
+    complex(kind(1.0d0)) :: BETA 
+    complex(kind(1.0d0)), intent(in)  :: A(nmatdim ,nmatdim)
+    complex(kind(1.0d0)), intent(in)  :: B(nmatdim ,nmatdim)
+    !complex(kind(1.0d0)) :: mat_mul(nmatdim,nmatdim)
+    complex(kind(1.0d0)), intent(out) :: C(nmatdim,nmatdim)
+ 
+    ALPHA=1.0d0 
+    BETA=0.0D0
+
+    C(:,:)=(0.0d0,0.0d0)
+ 
+    call ZGEMM('N','N',nmatdim,nmatdim,nmatdim,ALPHA,A,nmatdim,B,nmatdim,BETA,C,nmatdim)
+    return
+
+end subroutine mat_mul
