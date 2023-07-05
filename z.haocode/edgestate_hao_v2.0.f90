@@ -42,7 +42,7 @@ program hao_edgestates
 
     abstol=2.0*tiny(abstol)
     pi = 3.14159265
-    numkpts = 128
+    numkpts = 1280
  
     if(irank.eq.0)then
         write(*,*) "isize=", isize
