@@ -17,7 +17,7 @@ program hao_edgestates
     integer              :: ndiffatom,nexcludeup,nexcludedown,return_num_wann,locmin,locmax,i1,i2
     real                 :: vl,vu,abstol,ik1,time_start,time_end
     integer              :: length,length1,length2,length3,length4,length5
-    real,allocatable     :: eigvals(:),eigvals_per_k(:,:),temp_array(:),eigvals_per_k_mpi(:,:),ones(:)
+    real,allocatable     :: eigvals(:),eigvals_per_k(:,:),temp_array(:),eigvals_per_k_mpi(:,:)
     complex,allocatable  :: eigvecs(:,:)
     integer              :: ne,info,lwork,ik_cpu,omeganum
     complex,allocatable  :: work(:)
@@ -415,6 +415,15 @@ call MPI_Barrier(mpi_comm_world, ierr)
         H01= 0d0
         ones= 0d0
         k=0.0
+
+        omega=0d0
+        dos_l=0d0
+        dos_r=0d0
+        dos_l_mpi=0d0
+        dos_r_mpi=0d0
+        dos_bulk=0d0
+        dos_bulk_mpi=0d0
+
 
         if (irank.eq.0) then    
             write(*,*)"here is no problem7"
