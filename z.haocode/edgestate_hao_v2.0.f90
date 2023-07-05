@@ -346,10 +346,10 @@ call MPI_Barrier(mpi_comm_world, ierr)
 !     ! 广播layerintarr的内容
 !     call MPI_Bcast(layerintarr, Hdim, MPI_INTEGER, 0, mpi_comm_world, ierr)
     
-    if(.not.allocated(eigvals_per_k))then 
+    ! if(.not.allocated(eigvals_per_k))then 
         allocate(eigvals_per_k(numkpts,Hdim))
-    endif
-    call mpi_bcast(eigvals_per_k,size(eigvals_per_k),MPI_DOUBLE_PRECISION,0,mpi_comm_world,ierr)   
+    ! endif
+    ! call mpi_bcast(eigvals_per_k,size(eigvals_per_k),MPI_DOUBLE_PRECISION,0,mpi_comm_world,ierr)   
     eigvals_per_k=0.0
    
     if (irank.eq.0) then
@@ -420,16 +420,16 @@ call MPI_Barrier(mpi_comm_world, ierr)
           endif
 
 
-        if(.not.allocated(fourHamilton))then 
+        ! if(.not.allocated(fourHamilton))then 
             allocate(fourHamilton(layerspreadmin:layerspreadmax,num_wann,num_wann))
-        endif
-        call mpi_bcast(fourHamilton,size(fourHamilton),MPI_DOUBLE_PRECISION,0,mpi_comm_world,ierr)
+        ! endif
+        ! call mpi_bcast(fourHamilton,size(fourHamilton),MPI_DOUBLE_PRECISION,0,mpi_comm_world,ierr)
 
 
-        if(.not.allocated(hamiltonian))then 
+        ! if(.not.allocated(hamiltonian))then 
             allocate(hamiltonian(Hdim,Hdim))
-        endif
-        call mpi_bcast(hamiltonian,size(hamiltonian),MPI_DOUBLE_PRECISION,0,mpi_comm_world,ierr)
+        ! endif
+        ! call mpi_bcast(hamiltonian,size(hamiltonian),MPI_DOUBLE_PRECISION,0,mpi_comm_world,ierr)
 
 
         ! if (irank.eq.0) then    
@@ -445,17 +445,17 @@ call MPI_Barrier(mpi_comm_world, ierr)
         if (irank.eq.0) then    
             write(*,*)"here is no problem12"
         endif
-        call mpi_barrier(mpi_comm_world,ierr)
-    if(irank.eq.0)then 
+
+    ! if(irank.eq.0)then 
         do ik=1,numkpts
             k(ik) = ik*3*pi/numkpts
         enddo
-    endif
-        
-    if(.not.allocated(k))then 
-            allocate(k(numkpts))
-        endif
-    call mpi_bcast(k,numkpts,MPI_DOUBLE_PRECISION,0,mpi_comm_world,ierr)    
+    ! endif
+        call mpi_barrier(mpi_comm_world,ierr)
+    ! if(.not.allocated(k))then 
+    !         allocate(k(numkpts))
+    !     endif
+    ! call mpi_bcast(k,numkpts,MPI_DOUBLE_PRECISION,0,mpi_comm_world,ierr)    
     ! write(*,*)"noproblem_here3" ,irank  
     ! ik_cpu = 0
     ! do ik=1,numkpts
