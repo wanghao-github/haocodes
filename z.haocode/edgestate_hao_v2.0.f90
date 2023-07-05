@@ -533,9 +533,9 @@ call MPI_Barrier(mpi_comm_world, ierr)
        !对角化这个超胞哈密顿量
      write(*,*) "zheevx no problem, irank =" ,irank
     !    do ib=1,Hdim
-    !    write(*,*) "eigvals_per_k(ik,1)",eigvals(1)
-            ! eigvals_per_k(ik,:) = eigvals(:)
-    !    enddo
+       write(*,*) "eigvals_per_k(ik,1)",eigvals(1)
+            eigvals_per_k(ik,:) = eigvals(:)
+       enddo
     !  call mpi_barrier(mpi_comm_world,ierr)
     !  call MPI_Barrier(MPI_COMM_WORLD, ierr)
     ! if (irank /= 0) then
@@ -543,7 +543,7 @@ call MPI_Barrier(mpi_comm_world, ierr)
     ! else
     
          ! 将部分结果存储到临时数组
-         eigvals_per_k(ik,:) = eigvals(:)
+        !  eigvals_per_k(ik,:) = eigvals(:)
          ! 在所有CPU上进行归约操作
 
          ! 确定每个CPU发送的数据量
@@ -566,7 +566,7 @@ call MPI_Barrier(mpi_comm_world, ierr)
     !    end do
 !    end if     
 enddo
-call MPI_REDUCE(eigvals_per_k(:,:),eigvals_per_k_mpi(:,:),size(eigvals_per_k),MPI_DOUBLE_PRECISION,MPI_SUM,0,mpi_comm_world,ierr)
+! call MPI_REDUCE(eigvals_per_k(:,:),eigvals_per_k_mpi(:,:),size(eigvals_per_k),MPI_DOUBLE_PRECISION,MPI_SUM,0,mpi_comm_world,ierr)
     if(irank.eq.0)then
         open(222,file='kpts.out',recl=10000)
         do ik=1,numkpts
