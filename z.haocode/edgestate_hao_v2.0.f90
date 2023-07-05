@@ -540,7 +540,8 @@ call MPI_Barrier(mpi_comm_world, ierr)
     !    call MPI_Send(eigvals(:), Hdim, MPI_DOUBLE_COMPLEX, 0, irank, MPI_COMM_WORLD, ierr)
     ! else
        eigvals_per_k(ik, :) = eigvals(:)
-       write(*,*) "ik eigvals write done", "ik=",ik, "irank =" ,irank
+       write(*,*) "ik eigvals", ik, eigvals(:)
+    !    write(*,*) "ik eigvals write done", "ik=",ik, "irank =" ,irank
     !    do i = 1, isize - 1
     !         call MPI_Recv(eigvals(:), Hdim, MPI_DOUBLE_COMPLEX, 0, i,MPI_COMM_WORLD, stt, ierr)
     !         eigvals_per_k(ik, :) = eigvals_per_k(ik, :) + eigvals(:)
