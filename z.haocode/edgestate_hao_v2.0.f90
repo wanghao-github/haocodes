@@ -533,9 +533,9 @@ call MPI_Barrier(mpi_comm_world, ierr)
        !对角化这个超胞哈密顿量
      write(*,*) "zheevx no problem, irank =" ,irank
     !    do ib=1,Hdim
-       write(*,*) "eigvals_per_k(ik,1)",eigvals(1)
-            eigvals_per_k(ik,:) = eigvals(:)
-       enddo
+    !    write(*,*) "eigvals_per_k(ik,1)",eigvals(1)
+            ! eigvals_per_k(ik,:) = eigvals(:)
+    !    enddo
     !  call mpi_barrier(mpi_comm_world,ierr)
     !  call MPI_Barrier(MPI_COMM_WORLD, ierr)
     ! if (irank /= 0) then
@@ -558,8 +558,8 @@ call MPI_Barrier(mpi_comm_world, ierr)
 
 
     !    eigvals_per_k(ik, :) = eigvals(:)
-    !    write(*,*) "ik eigvals", ik, eigvals(:)
-    !    write(*,*) "ik eigvals write done", "ik=",ik, "irank =" ,irank
+       write(*,*) "ik eigvals", ik, eigvals(:)
+        write(*,*) "ik eigvals write done", "ik=",ik, "irank =" ,irank
     !    do i = 1, isize - 1
     !         call MPI_Recv(eigvals(:), Hdim, MPI_DOUBLE_COMPLEX, 0, i,MPI_COMM_WORLD, stt, ierr)
     !         eigvals_per_k(ik, :) = eigvals_per_k(ik, :) + eigvals(:)
