@@ -67,7 +67,7 @@ program hao_edgestates
     Np = 2
     ijmax = 10
     ! numkpts = 1280
-    omeganum= 300
+    omeganum= 411
 
 
     if(irank.eq.0)then
@@ -458,7 +458,7 @@ call MPI_Barrier(mpi_comm_world, ierr)
         enddo
 
         do i= 1, omeganum
-            omega(i)=-2+(i-1)*(2-(-2))/dble(omeganum)
+            omega(i)=-2+(i-1)*(2.1213-(-2.2312))/dble(omeganum)
         enddo
         
         do i=1,Ndim
