@@ -5,7 +5,7 @@ program hao_edgestates
     implicit none
 
     integer              :: nwannexup,nwannexdown,ix,iy,iz,band1,band2,rvecnum,nslab1,nslab2,ii,zvalue,ib,sendcount,Np,ijmax,Ndim,io
-    real                 :: fermi,rdum,idum,pi,phase,lattice_vec(3,3),w
+    real                 :: fermi,rdum,idum,pi,phase,lattice_vec(3,3),w,emin,emax
     integer,allocatable  :: nrpts(:),irvec(:,:)
     complex,allocatable  :: hops(:,:,:),ham(:,:),fourHamilton(:,:,:),hamiltonian(:,:)
     real,allocatable     :: k(:),localisationpar(:)
@@ -34,6 +34,9 @@ program hao_edgestates
     real(kind(1.0d0)), allocatable :: dos_r_mpi(:,:)
     real(kind(1.0d0)), allocatable :: dos_bulk(:,:)
     real(kind(1.0d0)), allocatable :: dos_bulk_mpi(:,:)
+    ! real(kind(1.0d0)), allocatable :: dos_r_only(:,:)
+    ! real(kind(1.0d0)), allocatable :: dos_l_only(:,:)
+
 
     complex(kind(1.0d0)), allocatable :: GLL(:,:)
     complex(kind(1.0d0)), allocatable :: GRR(:,:)
@@ -428,6 +431,8 @@ call MPI_Barrier(mpi_comm_world, ierr)
         omega=0d0
         dos_l=0d0
         dos_r=0d0
+        dos_l_only=0d0
+        dos_r_only=0d0
         dos_l_mpi=0d0
         dos_r_mpi=0d0
         dos_bulk=0d0
@@ -559,10 +564,82 @@ call mpi_reduce(dos_l, dos_l_mpi, size(dos_l),MPI_DOUBLE_PRECISION,MPI_SUM,0,mpi
 call mpi_reduce(dos_r, dos_r_mpi, size(dos_r),MPI_DOUBLE_PRECISION,MPI_SUM,0,mpi_comm_world,ierr)
 call mpi_reduce(dos_bulk, dos_bulk_mpi, size(dos_bulk),MPI_DOUBLE_PRECISION,MPI_SUM,0,mpi_comm_world,ierr)
 
-! dos_l=log(abs(dos_l_mpi))
-! dos_r=log(abs(dos_r_mpi))
-! dos_bulk=log(abs(dos_bulk_mpi)+0.000000001)
 
+dos_l=log(abs(dos_l_mpi))
+dos_r=log(abs(dos_r_mpi))
+dos_bulk=log(abs(dos_bulk_mpi)+0.000000001)
+
+do ik=1, numkpts
+    do j=1, omeganum
+        dos_l_only(ik, j)= dos_l_mpi(ik, j)- dos_bulk_mpi(ik, j)
+        if (dos_l_only(ik, j)<0) dos_l_only(ik, j)=0.0000000001
+        dos_r_only(ik, j)= dos_r_mpi(ik, j)- dos_bulk_mpi(ik, j)
+        if (dos_r_only(ik, j)<0) dos_r_only(ik, j)=0.0000000001
+    enddo
+enddo
+
+if (irank.eq.0)then
+    open (369, file='dos.dat_l')
+    open (370, file='dos.dat_r')
+    open (371, file='dos.dat_bulk')
+    do ik=1, numkpts
+        do j=1, omeganum
+            WRITE(doslfile, '(30f16.8)')k(ik), omega(j), dos_l(ik, j), log(dos_l_only(ik, j))
+            WRITE(dosrfile, '(30f16.8)')k(ik), omega(j), dos_r(ik, j), log(dos_r_only(ik, j))
+            WRITE(dosbulkfile, '(30f16.8)')k(ik), omega(j), dos_bulk(ik, j)
+        enddo
+        WRITE(369, *) ' '
+        WRITE(370, *) ' '
+        WRITE(371, *) ' '
+    enddo
+    CLOSE(369)
+    CLOSE(370)
+    CLOSE(371)
+
+    WRITE(stdout,*)'ndim',ndim
+    WRITE(stdout,*) 'numkpts,omeganum,eta',numkpts, omeganum
+    WRITE(stdout,*)'calculate density of state successfully'
+endif
+
+emin= minval(omega)
+emax= maxval(omega)
+!> write script for gnuplot
+if (irank==0) then
+   open(372, file='surfdos_l.gnu')
+   write(372, '(a)')"set encoding iso_8859_1"
+   write(372, '(a)')'#set terminal  postscript enhanced color'
+   write(372, '(a)')"#set output 'surfdos_l.eps'"
+   write(372, '(3a)')'#set terminal  pngcairo truecolor enhanced', &
+      '  font ", 60" size 1920, 1680'
+   write(372, '(3a)')'set terminal  png truecolor enhanced', &
+      ' font ", 60" size 1920, 1680'
+   write(372, '(a)')"set output 'surfdos_l.png'"
+   write(372,'(2a)') 'set palette defined (-10 "#194eff", ', &
+      '0 "white", 10 "red" )'
+   write(372, '(a)')'#set palette rgbformulae 33,13,10'
+   write(372, '(a)')'set style data linespoints'
+   write(372, '(a)')'set size 0.8, 1'
+   write(372, '(a)')'set origin 0.1, 0'
+   write(372, '(a)')'unset ztics'
+   write(372, '(a)')'unset key'
+   write(372, '(a)')'set pointsize 0.8'
+   write(372, '(a)')'set pm3d'
+   write(372, '(a)')'#set view equal xyz'
+   write(372, '(a)')'set view map'
+   write(372, '(a)')'set border lw 3'
+   write(372, '(a)')'#set cbtics font ",48"'
+   write(372, '(a)')'#set xtics font ",48"'
+   write(372, '(a)')'#set ytics font ",48"'
+   write(372, '(a)')'#set ylabel font ",48"'
+   write(372, '(a)')'set ylabel "Energy (eV)"'
+   write(372, '(a)')'#set xtics offset 0, -1'
+   write(372, '(a)')'#set ylabel offset -6, 0 '
+   write(372, '(a, f18.5, a, f18.5, a)')'set yrange [', emin, ':', emax, ']'
+   write(372, '(a)')'set pm3d interpolate 2,2'
+   write(372, '(2a)')"splot 'dos.dat_l' u 1:2:3 w pm3d"
+   CLOSE(372)
+
+endif
 
     if(irank.eq.0)then
         open(222,file='kpts.out',recl=10000)
