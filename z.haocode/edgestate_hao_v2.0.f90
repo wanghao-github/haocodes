@@ -543,7 +543,7 @@ call MPI_Barrier(mpi_comm_world, ierr)
             enddo ! i
             write(*,*) "dos_bulk ok"
         enddo ! j
-!!!!!!!
+!!!!!!!!!!!
 
   !  call mpi_allreduce(dos_l, dos_l_mpi, size(dos_l),MPI_DOUBLE_PRECISION,MPI_SUM,mpi_comm_world,ierr)
   !  call mpi_allreduce(dos_r, dos_r_mpi, size(dos_r),MPI_DOUBLE_PRECISION,MPI_SUM,mpi_comm_world,ierr)
