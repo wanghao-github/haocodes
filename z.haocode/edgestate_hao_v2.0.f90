@@ -15,7 +15,7 @@ program hao_edgestates
     integer,allocatable  :: wannperat(:),atomnumberarray(:),fourdir(:),layerintarr(:)
     integer,allocatable  :: excludeup(:),excludedown(:),temp(:),wannierfunctioninHam(:)
     integer              :: ndiffatom,nexcludeup,nexcludedown,return_num_wann,locmin,locmax,i1,i2
-    real                 :: vl,vu,abstol,ik1,time_start,time_end
+    real                 :: vl,vu,abstol,ik1,time_start,time_end,eta
     integer              :: length,length1,length2,length3,length4,length5
     real,allocatable     :: eigvals(:),eigvals_per_k(:,:),temp_array(:),eigvals_per_k_mpi(:,:)
     complex,allocatable  :: eigvecs(:,:)
@@ -70,7 +70,9 @@ program hao_edgestates
     omeganum = 500
     omegamax =  2
     omegamin = -2
-
+    
+    eta=(omegamax- omegamin)/dble(omeganum)*1.5d0
+    
     if(irank.eq.0)then
         write(*,*) "isize=", isize
         open(200,file='hopping.1')
@@ -535,7 +537,7 @@ call MPI_Barrier(mpi_comm_world, ierr)
         
         do j = 1, omeganum
             w=omega(j)
-            call surfgreen_1985(Ndim,omegamax,omegamin,omeganum,w,GLL,GRR,GB,H00,H01,ones)
+            call surfgreen_1985(Ndim,eta,w,GLL,GRR,GB,H00,H01,ones)
             ! write(*,*) "GRR GLL ok"
             do i= 1,num_wann
                 dos_l(ik, j)=dos_l(ik,j)- aimag(GLL(i,i))
@@ -605,7 +607,7 @@ if (irank.eq.0)then
     CLOSE(371)
 
     WRITE(*,*)'ndim',ndim
-    WRITE(*,*) 'numkpts,omeganum,eta',numkpts, omeganum
+    WRITE(*,*) 'numkpts,omeganum,eta',numkpts, omeganum,eta
     WRITE(*,*)'calculate density of state successfully'
 endif
 
@@ -693,14 +695,14 @@ subroutine now(time_now)
     return
  end subroutine now
 
- subroutine surfgreen_1985(Ndim,omegamax,omegamin,omeganum,omega,GLL,GRR,GB,H00,H01,ones)
+ subroutine surfgreen_1985(Ndim,eta,omega,GLL,GRR,GB,H00,H01,ones)
     implicit none
 
     ! inout variables     
     ! the factor 2 is induced by spin
     ! energy hbar omega
     real(kind(1.0d0)),intent(in) :: omega
-    real(kind(1.0d0)),intent(in) :: omegamax,omegamin,omeganum  
+    ! real(kind(1.0d0)),intent(in) :: omegamax,omegamin,omeganum  
     integer, intent(in) :: Ndim
     ! H00 Hamiltonian between nearest neighbour-quintuple-layers
     complex(kind(1.0d0)),intent(in) :: H00(Ndim,Ndim)
@@ -749,7 +751,7 @@ subroutine now(time_now)
     ! g0= inv(w-e_i)
     complex(kind(1.0d0)), allocatable :: g0 (:, :) 
 
-    eta = (omegamax- omegamin)/omeganum*2d0
+    ! eta = (omegamax- omegamin)/omeganum*2d0
     ! allocate some variables
     allocate(alphai(Ndim, Ndim)) 
     allocate(betai (Ndim, Ndim)) 
