@@ -566,6 +566,9 @@ call mpi_reduce(dos_l, dos_l_mpi, size(dos_l),MPI_DOUBLE_PRECISION,MPI_SUM,0,mpi
 call mpi_reduce(dos_r, dos_r_mpi, size(dos_r),MPI_DOUBLE_PRECISION,MPI_SUM,0,mpi_comm_world,ierr)
 call mpi_reduce(dos_bulk, dos_bulk_mpi, size(dos_bulk),MPI_DOUBLE_PRECISION,MPI_SUM,0,mpi_comm_world,ierr)
 
+dos_l_mpi= dos_l
+dos_r_mpi= dos_r
+dos_bulk_mpi= dos_bulk
 
 dos_l=log(abs(dos_l_mpi))
 dos_r=log(abs(dos_r_mpi))
