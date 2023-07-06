@@ -555,9 +555,9 @@ call MPI_Barrier(mpi_comm_world, ierr)
 
 enddo
 call MPI_ALLREDUCE(eigvals_per_k,eigvals_per_k_mpi,size(eigvals_per_k),MPI_DOUBLE_PRECISION,MPI_SUM,mpi_comm_world,ierr)
-! call mpi_reduce(dos_l, dos_l_mpi, size(dos_l),MPI_DOUBLE_PRECISION,MPI_SUM,0,mpi_comm_world,ierr)
-! call mpi_reduce(dos_r, dos_r_mpi, size(dos_r),MPI_DOUBLE_PRECISION,MPI_SUM,0,mpi_comm_world,ierr)
-! call mpi_reduce(dos_bulk, dos_bulk_mpi, size(dos_bulk),MPI_DOUBLE_PRECISION,MPI_SUM,0,mpi_comm_world,ierr)
+call mpi_reduce(dos_l, dos_l_mpi, size(dos_l),MPI_DOUBLE_PRECISION,MPI_SUM,0,mpi_comm_world,ierr)
+call mpi_reduce(dos_r, dos_r_mpi, size(dos_r),MPI_DOUBLE_PRECISION,MPI_SUM,0,mpi_comm_world,ierr)
+call mpi_reduce(dos_bulk, dos_bulk_mpi, size(dos_bulk),MPI_DOUBLE_PRECISION,MPI_SUM,0,mpi_comm_world,ierr)
 
 ! dos_l=log(abs(dos_l_mpi))
 ! dos_r=log(abs(dos_r_mpi))
@@ -577,13 +577,17 @@ call MPI_ALLREDUCE(eigvals_per_k,eigvals_per_k_mpi,size(eigvals_per_k),MPI_DOUBL
         enddo
         close(234) 
   !      
-       open(123,file='output_bands',recl=10000)
-        do ib=1,Hdim
-           do ik=1,numkpts
-                write(123,*), k(ik),eigvals_per_k_mpi(ik,ib)
-            enddo
-        enddo
-      close(123)  
+       open(123,file='dos_r',recl=10000)
+            write(123,*), dos_r_mpi
+      close(123)
+      
+      open(777,file='output_bands',recl=10000)
+      do ib=1,Hdim
+         do ik=1,numkpts
+              write(777,*), k(ik),eigvals_per_k_mpi(ik,ib)
+          enddo
+      enddo
+      close(777)
     !  enddo
     endif
 
