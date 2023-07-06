@@ -567,9 +567,9 @@ call mpi_reduce(dos_r, dos_r_mpi, size(dos_r),MPI_DOUBLE_PRECISION,MPI_SUM,0,mpi
 call mpi_reduce(dos_bulk, dos_bulk_mpi, size(dos_bulk),MPI_DOUBLE_PRECISION,MPI_SUM,0,mpi_comm_world,ierr)
 
 
-dos_l=log(abs(dos_l_mpi))
-dos_r=log(abs(dos_r_mpi))
-dos_bulk=log(abs(dos_bulk_mpi)+0.000000001)
+! dos_l=log(abs(dos_l_mpi))
+! dos_r=log(abs(dos_r_mpi))
+! dos_bulk=log(abs(dos_bulk_mpi)+0.000000001)
 write(*,*) "dos_r ok"
 
 do ik=1, numkpts
@@ -588,9 +588,9 @@ if (irank.eq.0)then
     open (371, file='dos.dat_bulk')
     do ik=1, numkpts
         do j=1, omeganum
-            WRITE(369, '(30f16.8)')k(ik), omega(j), dos_l(ik, j), log(dos_l_only(ik, j))
-            WRITE(370, '(30f16.8)')k(ik), omega(j), dos_r(ik, j), log(dos_r_only(ik, j))
-            WRITE(371, '(30f16.8)')k(ik), omega(j), dos_bulk(ik, j)
+            WRITE(369, '(30f16.8)')k(ik), omega(j), dos_l_mpi(ik, j), log(dos_l_only(ik, j))
+            WRITE(370, '(30f16.8)')k(ik), omega(j), dos_r_mpi(ik, j), log(dos_r_only(ik, j))
+            WRITE(371, '(30f16.8)')k(ik), omega(j), dos_bulk_mpi(ik, j)
         enddo
         WRITE(369, *) ' '
         WRITE(370, *) ' '
