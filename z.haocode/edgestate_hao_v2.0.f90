@@ -518,7 +518,7 @@ call MPI_Barrier(mpi_comm_world, ierr)
         do i=1,Np
             do j=1,Np
                 if (abs(i-j).le.(ijmax)) then
-                    H00(num_wann*(i-1)+1:num_wann*i,num_wann*(j-1)+1:num_wann*j)=fourHamilton(j-i,i,j)
+                    H00(num_wann*(i-1)+1:num_wann*i,num_wann*(j-1)+1:num_wann*j)=fourHamilton(j-i,:,:)
                     !!!这个是([[0 1],[-1,0]])的大块矩阵
                 endif
             enddo
@@ -529,7 +529,7 @@ call MPI_Barrier(mpi_comm_world, ierr)
         do i=1,Np
             do j=Np+1,Np*2
                 if (j-i.le.ijmax) then
-                    H01(num_wann*(i-1)+1:num_wann*i,num_wann*(j-1-Np)+1:num_wann*(j-Np))=fourHamilton(j-i,i,j)
+                    H01(num_wann*(i-1)+1:num_wann*i,num_wann*(j-1-Np)+1:num_wann*(j-Np))=fourHamilton(j-i,:,:)
                 endif
             enddo
         enddo
