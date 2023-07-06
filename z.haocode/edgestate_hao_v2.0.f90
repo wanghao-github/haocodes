@@ -423,6 +423,8 @@ call MPI_Barrier(mpi_comm_world, ierr)
 
         allocate(dos_l(numkpts, omeganum))
         allocate(dos_r(numkpts, omeganum))
+        allocate(dos_l_only(numkpts, omeganum))
+        allocate(dos_r_only(numkpts, omeganum))
         allocate(dos_l_mpi(numkpts, omeganum))
         allocate(dos_r_mpi(numkpts, omeganum))
         allocate(dos_bulk(numkpts, omeganum))
@@ -569,6 +571,7 @@ dos_l=log(abs(dos_l_mpi))
 dos_r=log(abs(dos_r_mpi))
 dos_bulk=log(abs(dos_bulk_mpi)+0.000000001)
 write(*,*) "dos_r ok"
+
 do ik=1, numkpts
     do j=1, omeganum
         dos_l_only(ik, j)= dos_l_mpi(ik, j)- dos_bulk_mpi(ik, j)
