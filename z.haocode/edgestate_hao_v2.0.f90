@@ -505,7 +505,7 @@ call MPI_Barrier(mpi_comm_world, ierr)
                 endif
             enddo
         enddo
-        write(*,*) "H00 ok", H00 
+        write(*,*) "H00 ok": 
 
         !!! H01new
         do i=1,Np
@@ -515,26 +515,26 @@ call MPI_Barrier(mpi_comm_world, ierr)
                 endif
             enddo
         enddo
-        write(*,*) "H01 ok",H01
+        write(*,*) "H01 ok"
         ! !!!H01new 是([[2 3],[1,2]])的大块矩阵
         
         do j = 1, omeganum
             w=omega(j)
             call surfgreen_1985(Ndim,w,GLL,GRR,GB,H00,H01,ones)
-            write(*,*) "GRR GLL ok",GLL
+            write(*,*) "GRR GLL ok"
             do i= 1,num_wann
                 dos_l(ik, j)=dos_l(ik,j)- aimag(GLL(i,i))
             enddo ! i
-            
+            write(*,*) "dos_l ok"
             do i= 1, num_wann
                 io= Ndim- num_wann+i
                 dos_r(ik, j)=dos_r(ik,j)- aimag(GRR(io,io))
             enddo ! i
-            
+            write(*,*) "dos_r ok"
             do i= 1, Ndim
                 dos_bulk(ik, j)=dos_bulk(ik,j)- aimag(GB(i,i))
             enddo ! i
-  
+            write(*,*) "dos_bulk ok"
         enddo ! j
 
 
