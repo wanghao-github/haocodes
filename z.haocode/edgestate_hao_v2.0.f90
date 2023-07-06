@@ -418,6 +418,13 @@ call MPI_Barrier(mpi_comm_world, ierr)
         ones= 0d0
         k=0.0
 
+        allocate(dos_l(numkpts, omeganum))
+        allocate(dos_r(numkpts, omeganum))
+        allocate(dos_l_mpi(numkpts, omeganum))
+        allocate(dos_r_mpi(numkpts, omeganum))
+        allocate(dos_bulk(numkpts, omeganum))
+        allocate(dos_bulk_mpi(numkpts, omeganum))
+
         omega=0d0
         dos_l=0d0
         dos_r=0d0
