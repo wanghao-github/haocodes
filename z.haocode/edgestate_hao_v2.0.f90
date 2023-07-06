@@ -584,9 +584,9 @@ if (irank.eq.0)then
     open (371, file='dos.dat_bulk')
     do ik=1, numkpts
         do j=1, omeganum
-            WRITE(doslfile, '(30f16.8)')k(ik), omega(j), dos_l(ik, j), log(dos_l_only(ik, j))
-            WRITE(dosrfile, '(30f16.8)')k(ik), omega(j), dos_r(ik, j), log(dos_r_only(ik, j))
-            WRITE(dosbulkfile, '(30f16.8)')k(ik), omega(j), dos_bulk(ik, j)
+            WRITE(369, '(30f16.8)')k(ik), omega(j), dos_l(ik, j), log(dos_l_only(ik, j))
+            WRITE(370, '(30f16.8)')k(ik), omega(j), dos_r(ik, j), log(dos_r_only(ik, j))
+            WRITE(371, '(30f16.8)')k(ik), omega(j), dos_bulk(ik, j)
         enddo
         WRITE(369, *) ' '
         WRITE(370, *) ' '
@@ -596,9 +596,9 @@ if (irank.eq.0)then
     CLOSE(370)
     CLOSE(371)
 
-    WRITE(stdout,*)'ndim',ndim
-    WRITE(stdout,*) 'numkpts,omeganum,eta',numkpts, omeganum
-    WRITE(stdout,*)'calculate density of state successfully'
+    WRITE(*,*)'ndim',ndim
+    WRITE(*,*) 'numkpts,omeganum,eta',numkpts, omeganum
+    WRITE(*,*)'calculate density of state successfully'
 endif
 
 emin= minval(omega)
