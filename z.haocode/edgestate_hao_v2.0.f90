@@ -457,7 +457,8 @@ call MPI_Barrier(mpi_comm_world, ierr)
         call mpi_bcast(wannierfunctioninham,Hdim,MPI_INTEGER,0,mpi_comm_world,ierr)
 
         do ik=1,numkpts
-            k(ik) = ik*3*pi/numkpts
+            k(ik) = ik*3/numkpts
+            ! k(ik) = ik*3*pi/numkpts
         enddo
 
         do i= 1, omeganum
