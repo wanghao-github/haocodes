@@ -533,20 +533,20 @@ call MPI_Barrier(mpi_comm_world, ierr)
         do j = 1, omeganum
             w=omega(j)
             call surfgreen_1985(Ndim,w,GLL,GRR,GB,H00,H01,ones)
-            write(*,*) "GRR GLL ok"
+            ! write(*,*) "GRR GLL ok"
             do i= 1,num_wann
                 dos_l(ik, j)=dos_l(ik,j)- aimag(GLL(i,i))
             enddo ! i
-            write(*,*) "dos_l ok"
+            ! write(*,*) "dos_l ok"
             do i= 1, num_wann
                 io= Ndim- num_wann+i
                 dos_r(ik, j)=dos_r(ik,j)- aimag(GRR(io,io))
             enddo ! i
-            write(*,*) "dos_r ok"
+            ! write(*,*) "dos_r ok"
             do i= 1, Ndim
                 dos_bulk(ik, j)=dos_bulk(ik,j)- aimag(GB(i,i))
             enddo ! i
-            write(*,*) "dos_bulk ok"
+            ! write(*,*) "dos_bulk ok"
         enddo ! j
 !
     
@@ -568,7 +568,7 @@ call mpi_reduce(dos_bulk, dos_bulk_mpi, size(dos_bulk),MPI_DOUBLE_PRECISION,MPI_
 dos_l=log(abs(dos_l_mpi))
 dos_r=log(abs(dos_r_mpi))
 dos_bulk=log(abs(dos_bulk_mpi)+0.000000001)
-
+write(*,*) "dos_r ok"
 do ik=1, numkpts
     do j=1, omeganum
         dos_l_only(ik, j)= dos_l_mpi(ik, j)- dos_bulk_mpi(ik, j)
@@ -577,6 +577,7 @@ do ik=1, numkpts
         if (dos_r_only(ik, j)<0) dos_r_only(ik, j)=0.0000000001
     enddo
 enddo
+write(*,*) "dos_r_only ok"
 
 if (irank.eq.0)then
     open (369, file='dos.dat_l')
@@ -603,6 +604,9 @@ endif
 
 emin= minval(omega)
 emax= maxval(omega)
+
+write(*,*) "emin=",emin,"emax=",emax
+
 !> write script for gnuplot
 if (irank==0) then
    open(372, file='surfdos_l.gnu')
@@ -654,9 +658,9 @@ endif
         enddo
         close(234) 
   !      
-       open(123,file='dos_r',recl=10000)
-            write(123,*), dos_r_mpi
-      close(123)
+    !    open(123,file='dos_r',recl=10000)
+    !         write(123,*), dos_r_mpi
+    !   close(123)
       
       open(777,file='output_bands',recl=10000)
       do ib=1,Hdim
