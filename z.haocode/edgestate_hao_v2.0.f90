@@ -505,7 +505,7 @@ call MPI_Barrier(mpi_comm_world, ierr)
                 endif
             enddo
         enddo
-        write(*,*) "H00 ok": 
+        write(*,*) "H00 ok" 
 
         !!! H01new
         do i=1,Np
