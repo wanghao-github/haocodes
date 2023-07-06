@@ -68,8 +68,8 @@ program hao_edgestates
     ijmax = 10
     ! numkpts = 1280
     omeganum = 500
-    omegamax =  2
-    omegamin = -2
+    omegamax = -3
+    omegamin = -4
     
     eta=(omegamax- omegamin)/dble(omeganum)*1.5d0
     
