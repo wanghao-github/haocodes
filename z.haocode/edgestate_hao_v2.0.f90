@@ -19,7 +19,7 @@ program hao_edgestates
     integer              :: length,length1,length2,length3,length4,length5
     real,allocatable     :: eigvals(:),eigvals_per_k(:,:),temp_array(:),eigvals_per_k_mpi(:,:)
     complex,allocatable  :: eigvecs(:,:)
-    integer              :: ne,info,lwork,ik_cpu,omeganum, omegamax,omegamin
+    integer              :: ne,info,lwork,ik_cpu,omeganum, omegamax,omegamin,nw_half
     complex,allocatable  :: work(:)
     integer,allocatable  :: iwork(:)
     real,allocatable     :: rwork(:)
@@ -46,7 +46,12 @@ program hao_edgestates
     complex(kind(1.0d0)), allocatable :: ones(:,:)
 
 
-
+    REAL(kind(1.0d0)),    ALLOCATABLE  :: sx_l(:, :), sy_l(:, :), sz_l(:, :)
+    REAL(kind(1.0d0)),    ALLOCATABLE  :: sx_r(:, :), sy_r(:, :), sz_r(:, :)
+    REAL(kind(1.0d0)),    ALLOCATABLE  :: sx_l_mpi(:, :), sy_l_mpi(:, :), sz_l_mpi(:, :)
+    REAL(kind(1.0d0)),    ALLOCATABLE  :: sx_r_mpi(:, :), sy_r_mpi(:, :), sz_r_mpi(:, :)
+    COMPLEX(kind(1.0d0)), ALLOCATABLE  :: sigma_x(:,:), sigma_y(:,:), sigma_z(:,:)
+    COMPLEX(kind(1.0d0)), ALLOCATABLE  :: ctemp(:,:)
 
     type                 :: atom
     integer              :: number
@@ -443,6 +448,18 @@ call MPI_Barrier(mpi_comm_world, ierr)
         dos_bulk=0d0
         dos_bulk_mpi=0d0
 
+        
+        ALLOCATE( sx_l(numkpts, omeganum), sy_l(numkpts, omeganum), sz_l(numkpts, omeganum))
+        ALLOCATE( sx_l_mpi(numkpts, omeganum), sy_l_mpi(numkpts, omeganum), sz_l_mpi(numkpts, omeganum))
+        ALLOCATE( sx_r(numkpts, omeganum), sy_r(numkpts, omeganum), sz_r(numkpts, omeganum))
+        ALLOCATE( sx_r_mpi(numkpts, omeganum), sy_r_mpi(numkpts, omeganum), sz_r_mpi(numkpts, omeganum))
+        ALLOCATE( sigma_x(ndim,ndim), sigma_y(ndim,ndim), sigma_z(ndim,ndim), ctemp(ndim,ndim))
+        sigma_x      = 0d0;      sigma_y      = 0d0;      sigma_z      = 0d0
+        sx_l         = 0d0;      sy_l         = 0d0;      sz_l         = 0d0
+        sx_r         = 0d0;      sy_r         = 0d0;      sz_r         = 0d0
+        sx_l_mpi     = 0d0;      sy_l_mpi     = 0d0;      sz_l_mpi     = 0d0
+        sx_r_mpi     = 0d0;      sy_r_mpi     = 0d0;      sz_r_mpi     = 0d0
+
 
         if (irank.eq.0) then    
             write(*,*)"here is no problem7"
@@ -468,7 +485,18 @@ call MPI_Barrier(mpi_comm_world, ierr)
         do i=1,Ndim
             ones(i,i)=1.0d0
         enddo
-
+        
+        nw_half = Num_wann/2
+        do i=1, Np
+           do j=1, nw_half
+              sigma_x( Num_wann*(i-1)+j        , Num_wann*(i-1)+j+nw_half ) =  1.0d0
+              sigma_x( Num_wann*(i-1)+j+nw_half, Num_wann*(i-1)+j         ) =  1.0d0
+              sigma_y( Num_wann*(i-1)+j        , Num_wann*(i-1)+j+nw_half ) = -cmplx(0,1)
+              sigma_y( Num_wann*(i-1)+j+nw_half, Num_wann*(i-1)+j         ) =  cmplx(0,1)
+              sigma_z( Num_wann*(i-1)+j        , Num_wann*(i-1)+j         ) =  1.0d0
+              sigma_z( Num_wann*(i-1)+j+nw_half, Num_wann*(i-1)+j+nw_half ) = -1.0d0
+           enddo 
+        enddo
 
         call mpi_barrier(mpi_comm_world,ierr)
 
@@ -553,6 +581,34 @@ call MPI_Barrier(mpi_comm_world, ierr)
                 dos_bulk(ik, j)=dos_bulk(ik,j)- aimag(GB(i,i))
             enddo ! i
             ! write(*,*) "dos_bulk ok"
+
+
+
+            !!! spinresolved
+            call mat_mul(ndim,gll,sigma_x,ctemp)
+            do i = 1, num_wann
+                sx_l_mpi(ik, j) = sx_l_mpi(ik, j)- AIMAG(ctemp(i,i))
+            enddo ! i
+            call mat_mul(ndim,gll,sigma_y,ctemp)
+            do i = 1, num_wann
+                sy_l_mpi(ik, j) = sy_l_mpi(ik, j)- AIMAG(ctemp(i,i))
+            enddo !
+            call mat_mul(ndim,gll,sigma_z,ctemp)
+            do i = 1, num_wann
+                sz_l_mpi(ik, j) = sz_l_mpi(ik, j)- AIMAG(ctemp(i,i))
+            enddo ! i
+            call mat_mul(ndim,grr,sigma_x,ctemp)
+            do i = 1, num_wann
+                sx_r_mpi(ik, j) = sx_r_mpi(ik, j)- AIMAG(ctemp(i,i))
+            enddo ! i
+            call mat_mul(ndim,grr,sigma_y,ctemp)
+            do i = 1, num_wann
+                sy_r_mpi(ik, j) = sy_r_mpi(ik, j)- AIMAG(ctemp(i,i))
+            enddo !
+            call mat_mul(ndim,grr,sigma_z,ctemp)
+            do i = 1, num_wann
+                sz_r_mpi(ik, j) = sz_r_mpi(ik, j)- AIMAG(ctemp(i,i))
+            enddo ! i
         enddo ! j
 !
     
@@ -563,8 +619,18 @@ call MPI_Barrier(mpi_comm_world, ierr)
     
     write(*,*) "AllREDUCE DONE"
 
-
 enddo
+
+!!! ALLREDUCE spin
+call mpi_allreduce(sx_l_mpi, sx_l, SIZE(sx_l), mpi_double_precision,mpi_sum, mpi_comm_world, ierr)
+call mpi_allreduce(sy_l_mpi, sy_l, SIZE(sy_l), mpi_double_precision,mpi_sum, mpi_comm_world, ierr)
+call mpi_allreduce(sz_l_mpi, sz_l, SIZE(sz_l), mpi_double_precision,mpi_sum, mpi_comm_world, ierr)
+call mpi_allreduce(sx_r_mpi, sx_r, SIZE(sx_r), mpi_double_precision,mpi_sum, mpi_comm_world, ierr)
+call mpi_allreduce(sy_r_mpi, sy_r, SIZE(sy_r), mpi_double_precision,mpi_sum, mpi_comm_world, ierr)
+call mpi_allreduce(sz_r_mpi, sz_r, SIZE(sz_r), mpi_double_precision,mpi_sum, mpi_comm_world, ierr)
+
+
+
 call MPI_ALLREDUCE(eigvals_per_k,eigvals_per_k_mpi,size(eigvals_per_k),MPI_DOUBLE_PRECISION,MPI_SUM,mpi_comm_world,ierr)
 call mpi_reduce(dos_l, dos_l_mpi, size(dos_l),MPI_DOUBLE_PRECISION,MPI_SUM,0,mpi_comm_world,ierr)
 call mpi_reduce(dos_r, dos_r_mpi, size(dos_r),MPI_DOUBLE_PRECISION,MPI_SUM,0,mpi_comm_world,ierr)
@@ -590,22 +656,36 @@ enddo
 write(*,*) "dos_r_only ok"
 
 if (irank.eq.0)then
-    open (369, file='dos.dat_l')
-    open (370, file='dos.dat_r')
-    open (371, file='dos.dat_bulk')
+    open(369, file='dos.dat_l')
+    open(370, file='dos.dat_r')
+    open(371, file='dos.dat_bulk')
+    open(372, file='spindos.dat_l')
+    open(373, file='spindos.dat_r')
     do ik=1, numkpts
         do j=1, omeganum
             WRITE(369, '(30f16.8)')k(ik), omega(j), dos_l(ik, j), log(dos_l_only(ik, j))
             WRITE(370, '(30f16.8)')k(ik), omega(j), dos_r(ik, j), log(dos_r_only(ik, j))
             WRITE(371, '(30f16.8)')k(ik), omega(j), dos_bulk(ik, j)
+
+            ! s0(1)=sx_l(ik, j); s0(2)=sy_l(ik, j); s0(3)=sz_l(ik, j); 
+            ! call rotate(s0, s1)
+            write(372, '(30f16.8)')k(ik),omega(j),sx_l(ik, j),sy_l(ik, j),sz_l(ik, j); 
+            ! s0(1)=sx_r(ikp, j); s0(2)=sy_r(ikp, j); s0(3)=sz_r(ikp, j); 
+            ! call rotate(s0, s1)
+            write(373, '(30f16.8)')k(ik),omega(j),sx_r(ik, j),sy_r(ik, j),sz_r(ik, j); 
+
         enddo
         WRITE(369, *) ' '
         WRITE(370, *) ' '
         WRITE(371, *) ' '
+        WRITE(372, *) ' '
+        WRITE(373, *) ' '
     enddo
     CLOSE(369)
     CLOSE(370)
     CLOSE(371)
+    CLOSE(372)
+    CLOSE(373)
 
     WRITE(*,*)'ndim',ndim
     WRITE(*,*) 'numkpts,omeganum,eta',numkpts, omeganum,eta
@@ -619,39 +699,50 @@ write(*,*) "emin=",emin,"emax=",emax
 
 !> write script for gnuplot
 if (irank==0) then
-   open(372, file='surfdos_l.gnu')
-   write(372, '(a)')"set encoding iso_8859_1"
-   write(372, '(a)')'#set terminal  postscript enhanced color'
-   write(372, '(a)')"#set output 'surfdos_l.eps'"
-   write(372, '(3a)')'#set terminal  pngcairo truecolor enhanced', &
-      '  font ", 60" size 1920, 1680'
-   write(372, '(3a)')'set terminal  png truecolor enhanced', &
-      ' font ", 60" size 1920, 1680'
-   write(372, '(a)')"set output 'surfdos_l.png'"
-   write(372,'(2a)') 'set palette defined (-10 "#194eff", ', &
-      '0 "white", 10 "red" )'
-   write(372, '(a)')'#set palette rgbformulae 33,13,10'
-   write(372, '(a)')'set style data linespoints'
-   write(372, '(a)')'set size 0.8, 1'
-   write(372, '(a)')'set origin 0.1, 0'
-   write(372, '(a)')'unset ztics'
-   write(372, '(a)')'unset key'
-   write(372, '(a)')'set pointsize 0.8'
-   write(372, '(a)')'set pm3d'
-   write(372, '(a)')'#set view equal xyz'
-   write(372, '(a)')'set view map'
-   write(372, '(a)')'set border lw 3'
-   write(372, '(a)')'#set cbtics font ",48"'
-   write(372, '(a)')'#set xtics font ",48"'
-   write(372, '(a)')'#set ytics font ",48"'
-   write(372, '(a)')'#set ylabel font ",48"'
-   write(372, '(a)')'set ylabel "Energy (eV)"'
-   write(372, '(a)')'#set xtics offset 0, -1'
-   write(372, '(a)')'#set ylabel offset -6, 0 '
-   write(372, '(a, f18.5, a, f18.5, a)')'set yrange [', emin, ':', emax, ']'
-   write(372, '(a)')'set pm3d interpolate 2,2'
-   write(372, '(2a)')"splot 'dos.dat_l' u 1:2:3 w pm3d"
-   CLOSE(372)
+    open(374, file='surfdos_l.gnu')
+    write(374, '(a)')"set encoding iso_8859_1"
+    write(374, '(a)')'#set terminal  postscript enhanced color'
+    write(374, '(a)')"#set output 'surfdos_l.eps'"
+    write(374, '(3a)')'#set terminal  pngcairo truecolor enhanced', &
+       '  font ", 60" size 1920, 1680'
+    write(374, '(3a)')'set terminal  png truecolor enhanced', &
+       ' font ", 60" size 1920, 1680'
+    write(374, '(a)')"set output 'surfdos_l.png'"
+    write(374,'(2a)') 'set palette defined (-10 "#194eff", ', &
+       '0 "white", 10 "red" )'
+    write(374, '(a)')'#set palette rgbformulae 33,13,10'
+    write(374, '(a)')'set style data linespoints'
+    write(374, '(a)')'set size 0.8, 1'
+    write(374, '(a)')'set origin 0.1, 0'
+    write(374, '(a)')'unset ztics'
+    write(374, '(a)')'unset key'
+    write(374, '(a)')'set pointsize 0.8'
+    write(374, '(a)')'set pm3d'
+    write(374, '(a)')'#set view equal xyz'
+    write(374, '(a)')'set view map'
+    write(374, '(a)')'set border lw 3'
+    write(374, '(a)')'#set cbtics font ",48"'
+    write(374, '(a)')'#set xtics font ",48"'
+    write(374, '(a)')'#set ytics font ",48"'
+    write(374, '(a)')'#set ylabel font ",48"'
+    write(374, '(a)')'set ylabel "Energy (eV)"'
+    write(374, '(a)')'#set xtics offset 0, -1'
+    write(374, '(a)')'#set ylabel offset -6, 0 '
+    write(374, '(a, f18.5, a, f18.5, a)')'set yrange [', emin, ':', emax, ']'
+    write(374, '(a)')'set pm3d interpolate 2,2'
+    write(374, '(2a)')"splot 'dos.dat_l' u 1:2:3 w pm3d"
+
+    write(374, '(3a)')'set terminal png truecolor enhanced',' font ", 30" size 1920, 1680'
+    write(374, '(a)')"set output 'spindos_l.png'"
+    write(374, '(a)')"set multiplot layout 3, 1"
+    write(374, '(a)')"set title 'sx'"
+    write(374, '(2a)')"splot 'spindos.dat_l' u 1:2:3 w pm3d "
+    write(374, '(a)')"set title 'sy'"
+    write(374, '(2a)')"splot 'spindos.dat_l' u 1:2:4 w pm3d"
+    write(374, '(a)')"set title 'sz'"
+    write(374, '(2a)')"splot 'spindos.dat_l' u 1:2:5 w pm3d"
+
+    CLOSE(374)
 
 endif
 
@@ -886,3 +977,17 @@ subroutine mat_mul(nmatdim,A,B,C)
     return
 
 end subroutine mat_mul
+
+
+subroutine rotate(R1, R2)
+    use para, only : dp, Urot
+    implicit none
+    real(dp), intent(in) :: R1(3)
+    real(dp), intent(inout) :: R2(3)
+ 
+    R2(1)= Urot(1, 1)*R1(1)+ Urot(1, 2)*R1(2)+ Urot(1, 3)*R1(3)
+    R2(2)= Urot(2, 1)*R1(1)+ Urot(2, 2)*R1(2)+ Urot(2, 3)*R1(3)
+    R2(3)= Urot(3, 1)*R1(1)+ Urot(3, 2)*R1(2)+ Urot(3, 3)*R1(3)
+ 
+    return
+ end subroutine rotate
