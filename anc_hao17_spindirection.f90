@@ -677,6 +677,8 @@ program anomalous_nernst_effect
 
     spin_texture=0.0d0
     spin_texture_mpi=0.0d0
+    ! spin_dir=0.0d0
+    ! spin_dir_mpi=0.0d0
     time_start = 0.0
     knv3= Nk1*Nk2*Nk3
     call now(time_start)
@@ -757,17 +759,27 @@ program anomalous_nernst_effect
         ! call mat_mul(num_wann,spin_sigma_z(:,:),eigvecs,spin_sigma_temp)
         ! call mat_mul(num_wann,eigvecs_dag,spin_sigma_temp,spin_sigma_z_comp(:,:))
 
-        call zheevx('V','A','U',num_wann,spin_sigma_x_comp,num_wann,vl,vu,1,num_wann,abstol,ne,&
-            eigvals_x,eigvecs_x,num_wann,work,lwork,rwork,iwork,ifail,info)
-        call zheevx('V','A','U',num_wann,spin_sigma_y_comp,num_wann,vl,vu,1,num_wann,abstol,ne,&
-            eigvals_y,eigvecs_y,num_wann,work,lwork,rwork,iwork,ifail,info)
-        call zheevx('V','A','U',num_wann,spin_sigma_z_comp,num_wann,vl,vu,1,num_wann,abstol,ne,&
-            eigvals_z,eigvecs_z,num_wann,work,lwork,rwork,iwork,ifail,info)
+        ! call zheevx('V','A','U',num_wann,spin_sigma_x_comp,num_wann,vl,vu,1,num_wann,abstol,ne,&
+        !     eigvals_x,eigvecs_x,num_wann,work,lwork,rwork,iwork,ifail,info)
+        ! call zheevx('V','A','U',num_wann,spin_sigma_y_comp,num_wann,vl,vu,1,num_wann,abstol,ne,&
+        !     eigvals_y,eigvecs_y,num_wann,work,lwork,rwork,iwork,ifail,info)
+        ! call zheevx('V','A','U',num_wann,spin_sigma_z_comp,num_wann,vl,vu,1,num_wann,abstol,ne,&
+        !     eigvals_z,eigvecs_z,num_wann,work,lwork,rwork,iwork,ifail,info)
 
-
-        spin_texture(ik,:,1)=eigvals_x
-        spin_texture(ik,:,2)=eigvals_y
-        spin_texture(ik,:,3)=eigvals_z
+        do m=1,num_wann
+            
+            spin_texture(ik,m,1) = spin_sigma_x_comp(m,m)
+            spin_texture(ik,m,2) = spin_sigma_y_comp(m,m)
+            spin_texture(ik,m,3) = spin_sigma_z_comp(m,m)
+            
+            spin_dir(1,m) = spin_sigma_x_comp(m,m)
+            spin_dir(2,m) = spin_sigma_y_comp(m,m)
+            spin_dir(3,m) = spin_sigma_z_comp(m,m)
+        
+        enddo
+        ! spin_texture(ik,:,1)=eigvals_x
+        ! spin_texture(ik,:,2)=eigvals_y
+        ! spin_texture(ik,:,3)=eigvals_z
 
         momentum=0.0 
         do ii=1,rvecnum 
@@ -869,7 +881,8 @@ program anomalous_nernst_effect
     ! call MPI_REDUCE(spin_dir_mpi,spin_dir_mpi2,num_spin,MPI_DOUBLE_PRECISION,MPI_SUM,0,mpi_comm_world,ierr)
     ! call MPI_REDUCE(spin_sigma_t_mpi,spin_sigma_tmpi2,num_wann*3,MPI_DOUBLE_PRECISION,MPI_SUM,0,mpi_comm_world,ierr)
     call MPI_REDUCE(spin_texture,spin_texture_mpi,size(spin_texture),MPI_DOUBLE_PRECISION,MPI_SUM,0,mpi_comm_world,ierr)
-    
+    call MPI_REDUCE(spin_dir,spin_dir_mpi,size(spin_dir_mpi),MPI_DOUBLE_PRECISION,MPI_SUM,0,mpi_comm_world,ierr)
+
     sigma_tensor_ahc_mpi=sigma_tensor_ahc_mpi2
     sigma_tensor_ahc_mpi=sigma_tensor_ahc_mpi/knv3/volume*condq*1.0e8*twopi
 
@@ -897,7 +910,6 @@ program anomalous_nernst_effect
         close(123)      
          
         open(456,file='spin_texture',recl=10000) 
-        ! write(456,*) spin_dir_mpi
         do ik = 1,knv3
             ikx=(ik-1)/(nk2*nk3)+1
             iky=((ik-1-(ikx-1)*Nk2*Nk3)/nk3)+1
@@ -905,18 +917,25 @@ program anomalous_nernst_effect
             do m=1,num_wann
                 write(456,*)"kx= ",(ikx-1)/dble(nk1),"ky= ",(iky-1)/dble(nk2),"kz= ",(ikz-1)/dble(nk3)
                 write(456,*)"m= ", m
-                write(456,*)"spindir_x=",spin_texture_mpi(ik,m,1)
-                write(456,*)"spindir_y=",spin_texture_mpi(ik,m,2)
-                write(456,*)"spindir_z=",spin_texture_mpi(ik,m,3)
+                write(456,*)"spintexture_x=",spin_texture_mpi(ik,m,1)
+                write(456,*)"spintexture_y=",spin_texture_mpi(ik,m,2)
+                write(456,*)"spintexture_z=",spin_texture_mpi(ik,m,3)
                 write(456,*)"************************************" 
             enddo
-!            write(456,*)"band_index",m
-!            write(456,*)"spindir_x",spin_dir_mpi2(1,m)
-!           write(456,*)"spindir_y",spin_dir_mpi2(2,m)
-!           write(456,*)"spindir_z",spin_dir_mpi2(3,m)
-!           write(456,*)"************************************"
         enddo
         close(456)
+
+        open(457,file='spin_dir',recl=10000) 
+        do m=1,num_wann
+            write(457,*)"m= ", m
+            write(457,*)"spindir_x=",spin_dir_mpi(1,m)
+            write(457,*)"spindir_y=",spin_dir_mpi(2,m)
+            write(457,*)"spindir_z=",spin_dir_mpi(3,m)
+            write(457,*)"************************************" 
+        enddo
+        close(457)
+
+
     endif 
     call mpi_barrier(mpi_comm_world,ierr) 
     call MPI_Finalize(ierr) 
