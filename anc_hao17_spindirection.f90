@@ -730,9 +730,9 @@ program anomalous_nernst_effect
         spin_sigma_y_comp = 0.0d0
         spin_sigma_z_comp = 0.0d0
 
-        spin_sigma_x_comp = MATMUL(eigvecs(:,:),MATMUL(spin_sigma_x,eigvecs(:,:)))
-        spin_sigma_y_comp = MATMUL(eigvecs(:,:),MATMUL(spin_sigma_y,eigvecs(:,:)))
-        spin_sigma_z_comp = MATMUL(eigvecs(:,:),MATMUL(spin_sigma_z,eigvecs(:,:)))
+        spin_sigma_x_comp = MATMUL(eigvecs_dag(:,:),MATMUL(spin_sigma_x,eigvecs(:,:)))
+        spin_sigma_y_comp = MATMUL(eigvecs_dag(:,:),MATMUL(spin_sigma_y,eigvecs(:,:)))
+        spin_sigma_z_comp = MATMUL(eigvecs_dag(:,:),MATMUL(spin_sigma_z,eigvecs(:,:)))
   
         ! spin_sigma_x_comp=(MATMUL(MATMUL(eigvecs,spin_sigma_x),eigvecs_dag)+MATMUL(MATMUL(eigvecs_dag,spin_sigma_x),eigvecs))/2
         ! spin_sigma_y_comp=(MATMUL(MATMUL(eigvecs,spin_sigma_y),eigvecs_dag)+MATMUL(MATMUL(eigvecs_dag,spin_sigma_y),eigvecs))/2
