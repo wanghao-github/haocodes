@@ -10,7 +10,7 @@ program anomalous_nernst_effect
     complex,allocatable:: paulifft(:,:,:) 
     complex,allocatable:: paulifft2(:,:,:) 
     
-    complex,allocatable:: spin_texture(:,:,:)
+    complex,allocatable:: spin_texture(:,:,:), spin_texture_mpi(:,:,:)
     real               :: rdum,idum 
     integer            :: ix,iy,iz,band1,band2,h,num_wann,num_wann_2,m,n
     integer            :: ik1,ik2,ik3 
@@ -346,16 +346,16 @@ program anomalous_nernst_effect
         read(14,'(<mod(rvecnum,15)>I5)') (nrpts(15*(rvecnum/15)+i),i=1,mod(rvecnum,15))           
         close(14)                                   
         
-        open(444,file='./rspauli.2')
-        num_lines=0
-        Do
-            read(444, fmt=*,end=555) ix,iy,iz,band1,band2,dir,rdum,idum
-            num_lines=num_lines+1
-            rvecnum=(num_lines-1)/(num_wann*num_wann*3)+1
-            rspauli_ori(band1, band2, dir, rvecnum)=cmplx(rdum,idum)
-        End Do
-555     continue
-        close(555)
+!         open(444,file='./rspauli.2')
+!         num_lines=0
+!         Do
+!             read(444, fmt=*,end=555) ix,iy,iz,band1,band2,dir,rdum,idum
+!             num_lines=num_lines+1
+!             rvecnum=(num_lines-1)/(num_wann*num_wann*3)+1
+!             rspauli_ori(band1, band2, dir, rvecnum)=cmplx(rdum,idum)
+!         End Do
+! 555     continue
+!         close(444)
       
     endif 
       
@@ -391,7 +391,6 @@ program anomalous_nernst_effect
         write(*,*) "mag_wann_orbs_index7", mag_wann_orbs_index7
         write(*,*) "mag_wann_orbs_index8", mag_wann_orbs_index8
 
-
         do m = 1,num_wann/2
         
         if (ANY(mag_wann_orbs_index1 == m))then
@@ -402,44 +401,44 @@ program anomalous_nernst_effect
 
         if (ANY(mag_wann_orbs_index2 == m))then
             write(*,*) "satisified 2", m
-                select_atom2(m,m) = 1
-                select_atom2(m+num_wann/2,m+num_wann/2) = 1
+            select_atom2(m,m) = 1
+            select_atom2(m+num_wann/2,m+num_wann/2) = 1
         endif
 
         if (ANY(mag_wann_orbs_index3 == m))then
             write(*,*) "satisified 3", m
-                select_atom3(m,m) = 1
-                select_atom3(m+num_wann/2,m+num_wann/2) = 1
+            select_atom3(m,m) = 1
+            select_atom3(m+num_wann/2,m+num_wann/2) = 1
         endif
 
         if (ANY(mag_wann_orbs_index4 == m))then
             write(*,*) "satisified 4", m
-                select_atom4(m,m) = 1
-                select_atom4(m+num_wann/2,m+num_wann/2) = 1
+            select_atom4(m,m) = 1
+            select_atom4(m+num_wann/2,m+num_wann/2) = 1
         endif
 
         if (ANY(mag_wann_orbs_index5 == m))then
             write(*,*) "satisified 5", m
-                select_atom5(m,m) = 1
-                select_atom5(m+num_wann/2,m+num_wann/2) = 1
+            select_atom5(m,m) = 1
+            select_atom5(m+num_wann/2,m+num_wann/2) = 1
         endif
 
         if (ANY(mag_wann_orbs_index6 == m))then
             write(*,*) "satisified 6", m
-                select_atom6(m,m) = 1
-                select_atom6(m+num_wann/2,m+num_wann/2) = 1
+            select_atom6(m,m) = 1
+            select_atom6(m+num_wann/2,m+num_wann/2) = 1
         endif
 
         if (ANY(mag_wann_orbs_index7 == m))then
             write(*,*) "satisified 7", m
-                select_atom7(m,m) = 1
-                select_atom7(m+num_wann/2,m+num_wann/2) = 1
+            select_atom7(m,m) = 1
+            select_atom7(m+num_wann/2,m+num_wann/2) = 1
         endif
 
         if (ANY(mag_wann_orbs_index8 == m))then
             write(*,*) "satisified 8", m
-                select_atom8(m,m) = 1
-                select_atom8(m+num_wann/2,m+num_wann/2) = 1
+            select_atom8(m,m) = 1
+            select_atom8(m+num_wann/2,m+num_wann/2) = 1
         endif
 
         enddo
@@ -459,7 +458,7 @@ program anomalous_nernst_effect
         if (l_mag_vec .eq. .true.)then
             do ii = 1,rvecnum
             ! for m in 1,num_wann
-               ! for n in 1,num_wann
+                ! for n in 1,num_wann
                 do dir = 1,3
 
                     rspauli1(:,:,dir,ii) = MATMUL(MATMUL(select_atom1,rspauli(:,:,dir,ii)),select_atom1)
@@ -518,24 +517,24 @@ program anomalous_nernst_effect
      ! rspauli_final = 
 
     if(irank.eq.0)then
-    ! open(444,file='new_rspauli1')
-    open(987,file='rspauli_ori')
-    open(567,file='rspauli_final')
+    open(555,file='new_rspauli1')
+    ! open(987,file='rspauli_ori')
+    ! open(567,file='rspauli_final')
     do ii = 1, rvecnum
         do i = 1, num_wann
             do j= 1, num_wann
                 do dir =1,3
-                    ! write(444,'(6I5,3F16.8)') irvec(1,ii) ,irvec(2,ii), irvec(3,ii), j,i, dir, rspauli1(j,i,dir,ii)
-                    write(987,'(6I5,3F16.8)') irvec(1,ii) ,irvec(2,ii),irvec(3,ii), j,i, dir, rspauli_ori(j,i,dir,ii)
-                    write(567,'(6I5,3F16.8)') irvec(1,ii) ,irvec(2,ii), irvec(3,ii), j,i, dir, rspauli_final(j,i,dir,ii)
+                    write(444,'(6I5,3F16.8)') irvec(1,ii) ,irvec(2,ii), irvec(3,ii), j,i, dir, rspauli1(j,i,dir,ii)
+                    ! write(987,'(6I5,3F16.8)') irvec(1,ii) ,irvec(2,ii),irvec(3,ii), j,i, dir, rspauli_ori(j,i,dir,ii)
+                    ! write(567,'(6I5,3F16.8)') irvec(1,ii) ,irvec(2,ii), irvec(3,ii), j,i, dir, rspauli_final(j,i,dir,ii)
                 enddo
             enddo
         enddo
     enddo
     
-    close(567)
-    close(987)
-    ! close(555)
+    ! close(567)
+    ! close(987)
+    close(555)
     endif  
 
     if(irank.eq.0)then
@@ -577,10 +576,13 @@ program anomalous_nernst_effect
     length=num_wann*num_wann*rvecnum*3
     call mpi_bcast(rspauli_final,length,MPI_DOUBLE_COMPLEX,0,mpi_comm_world,ierr)
 
-    if(.not.allocated(rspauli_final))allocate(rspauli_final(num_wann,num_wann,3,rvecnum))
+    if(.not.allocated(spin_sigma_x))allocate(spin_sigma_x(num_wann,num_wann))
     call mpi_bcast(spin_sigma_x,size(spin_sigma_x),MPI_DOUBLE_COMPLEX,0,mpi_comm_world,ierr)
 
+    if(.not.allocated(spin_sigma_y))allocate(spin_sigma_y(num_wann,num_wann))
     call mpi_bcast(spin_sigma_y,size(spin_sigma_y),MPI_DOUBLE_COMPLEX,0,mpi_comm_world,ierr)
+
+    if(.not.allocated(spin_sigma_z))allocate(spin_sigma_z(num_wann,num_wann))
     call mpi_bcast(spin_sigma_z,size(spin_sigma_z),MPI_DOUBLE_COMPLEX,0,mpi_comm_world,ierr)
                                                                                                                         
     cross(1)=amat(1,2)*amat(2,3)-amat(1,3)*amat(2,2) 
@@ -616,7 +618,8 @@ program anomalous_nernst_effect
     allocate(Omega_x(num_wann), Omega_y(num_wann), Omega_z(num_wann))
     allocate(Omega_x_t(num_wann), Omega_y_t(num_wann), Omega_z_t(num_wann))
 
-    allocate(spin_texture(Nk1*Nk2*Nk3,num_wann,3))  
+    allocate(spin_texture(Nk1*Nk2*Nk3,num_wann,3))
+    allocate(spin_texture_mpi(Nk1*Nk2*Nk3,num_wann,3))   
     allocate(spin_dir(3,num_wann))
     allocate(spin_dir_mpi(3,num_wann))
     allocate(spin_dir_mpi2(3,num_wann))
@@ -672,7 +675,8 @@ program anomalous_nernst_effect
     allocate( iwork(15*num_wann) ) 
     allocate( ifail(15*num_wann) ) 
 
-      !spin_texture=0.0d0
+    spin_texture=0.0d0
+    spin_texture_mpi=0.0d0
     time_start = 0.0
     knv3= Nk1*Nk2*Nk3
     call now(time_start)
@@ -726,9 +730,9 @@ program anomalous_nernst_effect
         spin_sigma_y_comp = 0.0d0
         spin_sigma_z_comp = 0.0d0
 
-        spin_sigma_x_comp=MATMUL(eigvecs(:,:),MATMUL(pauli(:,:,1),eigvecs(:,:)))
-        spin_sigma_y_comp=MATMUL(eigvecs(:,:),MATMUL(pauli(:,:,2),eigvecs(:,:)))
-        spin_sigma_z_comp=MATMUL(eigvecs(:,:),MATMUL(pauli(:,:,3),eigvecs(:,:)))
+        spin_sigma_x_comp = MATMUL(eigvecs(:,:),MATMUL(spin_sigma_x,eigvecs(:,:)))
+        spin_sigma_y_comp = MATMUL(eigvecs(:,:),MATMUL(spin_sigma_y,eigvecs(:,:)))
+        spin_sigma_z_comp = MATMUL(eigvecs(:,:),MATMUL(spin_sigma_z,eigvecs(:,:)))
   
         ! spin_sigma_x_comp=(MATMUL(MATMUL(eigvecs,spin_sigma_x),eigvecs_dag)+MATMUL(MATMUL(eigvecs_dag,spin_sigma_x),eigvecs))/2
         ! spin_sigma_y_comp=(MATMUL(MATMUL(eigvecs,spin_sigma_y),eigvecs_dag)+MATMUL(MATMUL(eigvecs_dag,spin_sigma_y),eigvecs))/2
@@ -864,7 +868,8 @@ program anomalous_nernst_effect
     call MPI_REDUCE(sigma_tensor_ahc_mpi,sigma_tensor_ahc_mpi2,num_steps_tot,MPI_DOUBLE_PRECISION,MPI_SUM,0,mpi_comm_world,ierr)
     ! call MPI_REDUCE(spin_dir_mpi,spin_dir_mpi2,num_spin,MPI_DOUBLE_PRECISION,MPI_SUM,0,mpi_comm_world,ierr)
     ! call MPI_REDUCE(spin_sigma_t_mpi,spin_sigma_tmpi2,num_wann*3,MPI_DOUBLE_PRECISION,MPI_SUM,0,mpi_comm_world,ierr)
-
+    call MPI_REDUCE(spin_texture,spin_texture_mpi,size(spin_texture),MPI_DOUBLE_PRECISION,MPI_SUM,0,mpi_comm_world,ierr)
+    
     sigma_tensor_ahc_mpi=sigma_tensor_ahc_mpi2
     sigma_tensor_ahc_mpi=sigma_tensor_ahc_mpi/knv3/volume*condq*1.0e8*twopi
 
@@ -900,9 +905,9 @@ program anomalous_nernst_effect
             do m=1,num_wann
                 write(456,*)"kx= ",(ikx-1)/dble(nk1),"ky= ",(iky-1)/dble(nk2),"kz= ",(ikz-1)/dble(nk3)
                 write(456,*)"m= ", m
-                write(456,*)"spindir_x=",spin_texture(ik,m,1)
-                write(456,*)"spindir_y=",spin_texture(ik,m,2)
-                write(456,*)"spindir_z=",spin_texture(ik,m,3)
+                write(456,*)"spindir_x=",spin_texture_mpi(ik,m,1)
+                write(456,*)"spindir_y=",spin_texture_mpi(ik,m,2)
+                write(456,*)"spindir_z=",spin_texture_mpi(ik,m,3)
                 write(456,*)"************************************" 
             enddo
 !            write(456,*)"band_index",m
