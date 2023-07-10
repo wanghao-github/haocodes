@@ -715,12 +715,12 @@ program anomalous_nernst_effect
 
         eigvecs_dag=conjg(transpose(eigvecs))
 
-        !  call zheevx('V','A','U',num_wann,pauli(:,:,1),num_wann,vl,vu,1,num_wann,abstol,ne,&
-        !       eigvals_x,eigvecs_x,num_wann,work,lwork,rwork,iwork,ifail,info)
-        !  call zheevx('V','A','U',num_wann,pauli(:,:,2),num_wann,vl,vu,1,num_wann,abstol,ne,&
-        !      eigvals_y,eigvecs_y,num_wann,work,lwork,rwork,iwork,ifail,info)
+        ! call zheevx('V','A','U',num_wann,pauli(:,:,1),num_wann,vl,vu,1,num_wann,abstol,ne,&
+            ! eigvals_x,eigvecs_x,num_wann,work,lwork,rwork,iwork,ifail,info)
+        ! call zheevx('V','A','U',num_wann,pauli(:,:,2),num_wann,vl,vu,1,num_wann,abstol,ne,&
+            ! eigvals_y,eigvecs_y,num_wann,work,lwork,rwork,iwork,ifail,info)
         ! call zheevx('V','A','U',num_wann,pauli(:,:,3),num_wann,vl,vu,1,num_wann,abstol,ne,&
-        !      eigvals_z,eigvecs_z,num_wann,work,lwork,rwork,iwork,ifail,info)
+            ! eigvals_z,eigvecs_z,num_wann,work,lwork,rwork,iwork,ifail,info)
 
         spin_sigma_x_comp = 0.0d0
         spin_sigma_y_comp = 0.0d0
@@ -815,20 +815,20 @@ program anomalous_nernst_effect
             enddo !n
         enddo  !m
 
-         ! do m=1,num_wann
-         !    spin_dir(1,m) = eigvals_x(m)
-         !    spin_dir(2,m) = eigvals_y(m)
-         !    spin_dir(3,m) = eigvals_z(m)
-         ! enddo
+        ! do m=1,num_wann
+            ! spin_dir(1,m) = eigvals_x(m)
+            ! spin_dir(2,m) = eigvals_y(m)
+            ! spin_dir(3,m) = eigvals_z(m)
+        ! enddo
         
          
-      !   spin_dir_mpi = spin_dir
+        ! spin_dir_mpi = spin_dir
          
-!         if (irank == 0)then
-!            write(*,*) "spindir_x",spin_dir(1,:)
-!            write(*,*) "spindir_y",spin_dir(2,:)
-!            write(*,*) "spindir_z",spin_dir(3,:)
-!         endif
+        ! if (irank == 0)then
+        ! write(*,*) "spindir_x",spin_dir(1,:)
+        ! write(*,*) "spindir_y",spin_dir(2,:)
+        ! write(*,*) "spindir_z",spin_dir(3,:)
+        ! endif
         Omega_x = Omega_x*2.0
         Omega_y = Omega_y*2.0
         Omega_z = Omega_z*2.0   
