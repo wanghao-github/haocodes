@@ -18,7 +18,7 @@ program anomalous_nernst_effect
     real               :: phas 
     complex            :: fac,fac2,zi
     complex,allocatable:: ham(:,:),spin_sigma_x(:,:),spin_sigma_y(:,:),spin_sigma_z(:,:),spin_sigma_temp(:,:)
-    complex,allocatable:: spin_sigma_x_comp(:,:),spin_sigma_y_comp(:,:),spin_sigma_z_comp(:,:),spin_sigma_t_mpi(:,:),spin_sigma_t_mpi2(:,:)
+    complex,allocatable:: spin_sigma_x_comp(:),spin_sigma_y_comp(:),spin_sigma_z_comp(:),spin_sigma_t_mpi(:,:),spin_sigma_t_mpi2(:,:)
     real               :: vl,vu 
     integer            :: ne,j 
     real               :: abstol,time_start,time_end ,time_start1,time_end1
@@ -346,16 +346,16 @@ program anomalous_nernst_effect
         read(14,'(<mod(rvecnum,15)>I5)') (nrpts(15*(rvecnum/15)+i),i=1,mod(rvecnum,15))           
         close(14)                                   
         
-!         open(444,file='./rspauli.2')
-!         num_lines=0
-!         Do
-!             read(444, fmt=*,end=555) ix,iy,iz,band1,band2,dir,rdum,idum
-!             num_lines=num_lines+1
-!             rvecnum=(num_lines-1)/(num_wann*num_wann*3)+1
-!             rspauli_ori(band1, band2, dir, rvecnum)=cmplx(rdum,idum)
-!         End Do
-! 555     continue
-!         close(444)
+        open(444,file='./rspauli.2')
+        num_lines=0
+        Do
+            read(444, fmt=*,end=555) ix,iy,iz,band1,band2,dir,rdum,idum
+            num_lines=num_lines+1
+            rvecnum=(num_lines-1)/(num_wann*num_wann*3)+1
+            rspauli_ori(band1, band2, dir, rvecnum)=cmplx(rdum,idum)
+        End Do
+555     continue
+        close(444)
       
     endif 
       
@@ -472,69 +472,69 @@ program anomalous_nernst_effect
 
                 enddo
                 !!! 下面是传统的直接把rspauli加到hop上的方法
-                hops(:,:,ii) = hops(:,:,ii) + mag_field_x1 * rspauli1(:,:,1,ii)/2.0d0 + &
-                mag_field_y1 * rspauli1(:,:,2,ii)/2.0d0 + mag_field_z1 * rspauli1(:,:,3,ii)/2.0d0 + &
-                mag_field_x2 * rspauli2(:,:,1,ii)/2.0d0 + mag_field_y2 * rspauli2(:,:,2,ii)/2.0d0 + & 
-                mag_field_z2 * rspauli2(:,:,3,ii)/2.0d0 + mag_field_x3 * rspauli3(:,:,1,ii)/2.0d0 + &
-                mag_field_y3 * rspauli3(:,:,2,ii)/2.0d0 + mag_field_z3 * rspauli3(:,:,3,ii)/2.0d0 + &
-                mag_field_x4 * rspauli4(:,:,1,ii)/2.0d0 + mag_field_y4 * rspauli4(:,:,2,ii)/2.0d0 + &
-                mag_field_z4 * rspauli4(:,:,3,ii)/2.0d0 + mag_field_x5 * rspauli5(:,:,1,ii)/2.0d0 + &
-                mag_field_y5 * rspauli5(:,:,2,ii)/2.0d0 + mag_field_z5 * rspauli5(:,:,3,ii)/2.0d0 + &
-                mag_field_x6 * rspauli6(:,:,1,ii)/2.0d0 + mag_field_y6 * rspauli6(:,:,2,ii)/2.0d0 + &
-                mag_field_z6 * rspauli6(:,:,3,ii)/2.0d0 + mag_field_x7 * rspauli7(:,:,1,ii)/2.0d0 + &
-                mag_field_y7 * rspauli7(:,:,2,ii)/2.0d0 + mag_field_z7 * rspauli7(:,:,3,ii)/2.0d0 + &
-                mag_field_x8 * rspauli8(:,:,1,ii)/2.0d0 + mag_field_y8 * rspauli8(:,:,2,ii)/2.0d0 + &
-                mag_field_z8 * rspauli8(:,:,3,ii)/2.0d0 
+                ! hops(:,:,ii) = hops(:,:,ii) + mag_field_x1 * rspauli1(:,:,1,ii)/2.0d0 + &
+                ! mag_field_y1 * rspauli1(:,:,2,ii)/2.0d0 + mag_field_z1 * rspauli1(:,:,3,ii)/2.0d0 + &
+                ! mag_field_x2 * rspauli2(:,:,1,ii)/2.0d0 + mag_field_y2 * rspauli2(:,:,2,ii)/2.0d0 + & 
+                ! mag_field_z2 * rspauli2(:,:,3,ii)/2.0d0 + mag_field_x3 * rspauli3(:,:,1,ii)/2.0d0 + &
+                ! mag_field_y3 * rspauli3(:,:,2,ii)/2.0d0 + mag_field_z3 * rspauli3(:,:,3,ii)/2.0d0 + &
+                ! mag_field_x4 * rspauli4(:,:,1,ii)/2.0d0 + mag_field_y4 * rspauli4(:,:,2,ii)/2.0d0 + &
+                ! mag_field_z4 * rspauli4(:,:,3,ii)/2.0d0 + mag_field_x5 * rspauli5(:,:,1,ii)/2.0d0 + &
+                ! mag_field_y5 * rspauli5(:,:,2,ii)/2.0d0 + mag_field_z5 * rspauli5(:,:,3,ii)/2.0d0 + &
+                ! mag_field_x6 * rspauli6(:,:,1,ii)/2.0d0 + mag_field_y6 * rspauli6(:,:,2,ii)/2.0d0 + &
+                ! mag_field_z6 * rspauli6(:,:,3,ii)/2.0d0 + mag_field_x7 * rspauli7(:,:,1,ii)/2.0d0 + &
+                ! mag_field_y7 * rspauli7(:,:,2,ii)/2.0d0 + mag_field_z7 * rspauli7(:,:,3,ii)/2.0d0 + &
+                ! mag_field_x8 * rspauli8(:,:,1,ii)/2.0d0 + mag_field_y8 * rspauli8(:,:,2,ii)/2.0d0 + &
+                ! mag_field_z8 * rspauli8(:,:,3,ii)/2.0d0 
             
                 !!! 这个是我又想出来的制造完美spiral然后再加 原始rspauli的方法2
 
-                ! rspauli_final(:,:,1,ii) = rspauli_final(:,:,1,ii) + mag_field_x1 * rspauli1(:,:,1,ii)/2.0d0 + &
-                ! mag_field_x2 * rspauli2(:,:,1,ii)/2.0d0 + mag_field_x3 * rspauli3(:,:,1,ii)/2.0d0 + &
-                ! mag_field_x4 * rspauli4(:,:,1,ii)/2.0d0 + mag_field_x5 * rspauli5(:,:,1,ii)/2.0d0 + &
-                ! mag_field_x6 * rspauli6(:,:,1,ii)/2.0d0 + mag_field_x7 * rspauli7(:,:,1,ii)/2.0d0 + &
-                ! mag_field_x8 * rspauli8(:,:,1,ii)/2.0d0
+                rspauli_final(:,:,1,ii) = rspauli_final(:,:,1,ii) + mag_field_x1 * rspauli1(:,:,1,ii)/2.0d0 + &
+                mag_field_x2 * rspauli2(:,:,1,ii)/2.0d0 + mag_field_x3 * rspauli3(:,:,1,ii)/2.0d0 + &
+                mag_field_x4 * rspauli4(:,:,1,ii)/2.0d0 + mag_field_x5 * rspauli5(:,:,1,ii)/2.0d0 + &
+                mag_field_x6 * rspauli6(:,:,1,ii)/2.0d0 + mag_field_x7 * rspauli7(:,:,1,ii)/2.0d0 + &
+                mag_field_x8 * rspauli8(:,:,1,ii)/2.0d0
 
-                ! rspauli_final(:,:,2,ii) = rspauli_final(:,:,2,ii) + mag_field_y1 * rspauli1(:,:,2,ii)/2.0d0 + &
-                ! mag_field_y2 * rspauli2(:,:,2,ii)/2.0d0 + mag_field_y3 * rspauli3(:,:,2,ii)/2.0d0 + &
-                ! mag_field_y4 * rspauli4(:,:,2,ii)/2.0d0 + mag_field_y5 * rspauli5(:,:,2,ii)/2.0d0 + &
-                ! mag_field_y6 * rspauli6(:,:,2,ii)/2.0d0 + mag_field_y7 * rspauli7(:,:,2,ii)/2.0d0 + &
-                ! mag_field_y8 * rspauli8(:,:,2,ii)/2.0d0
+                rspauli_final(:,:,2,ii) = rspauli_final(:,:,2,ii) + mag_field_y1 * rspauli1(:,:,2,ii)/2.0d0 + &
+                mag_field_y2 * rspauli2(:,:,2,ii)/2.0d0 + mag_field_y3 * rspauli3(:,:,2,ii)/2.0d0 + &
+                mag_field_y4 * rspauli4(:,:,2,ii)/2.0d0 + mag_field_y5 * rspauli5(:,:,2,ii)/2.0d0 + &
+                mag_field_y6 * rspauli6(:,:,2,ii)/2.0d0 + mag_field_y7 * rspauli7(:,:,2,ii)/2.0d0 + &
+                mag_field_y8 * rspauli8(:,:,2,ii)/2.0d0
 
-                ! rspauli_final(:,:,3,ii) = rspauli_final(:,:,3,ii) + mag_field_z1 * rspauli1(:,:,3,ii)/2.0d0 + &
-                ! mag_field_z2 * rspauli2(:,:,3,ii)/2.0d0 + mag_field_z3 * rspauli3(:,:,3,ii)/2.0d0 + &
-                ! mag_field_z4 * rspauli4(:,:,3,ii)/2.0d0 + mag_field_z5 * rspauli5(:,:,3,ii)/2.0d0 + &
-                ! mag_field_z6 * rspauli6(:,:,3,ii)/2.0d0 + mag_field_z7 * rspauli7(:,:,3,ii)/2.0d0 + &
-                ! mag_field_z8 * rspauli8(:,:,3,ii)/2.0d0
+                rspauli_final(:,:,3,ii) = rspauli_final(:,:,3,ii) + mag_field_z1 * rspauli1(:,:,3,ii)/2.0d0 + &
+                mag_field_z2 * rspauli2(:,:,3,ii)/2.0d0 + mag_field_z3 * rspauli3(:,:,3,ii)/2.0d0 + &
+                mag_field_z4 * rspauli4(:,:,3,ii)/2.0d0 + mag_field_z5 * rspauli5(:,:,3,ii)/2.0d0 + &
+                mag_field_z6 * rspauli6(:,:,3,ii)/2.0d0 + mag_field_z7 * rspauli7(:,:,3,ii)/2.0d0 + &
+                mag_field_z8 * rspauli8(:,:,3,ii)/2.0d0
 
             enddo
             !!! 和方法2是一起的
-            ! do ii = 1,rvecnum
-            !     hops(:,:,ii)=hops(:,:,ii)+rspauli_final(:,:,1,ii)+rspauli_final(:,:,2,ii)+rspauli_final(:,:,3,ii) + &
-            !     rspauli_ori(:,:,1,ii)+rspauli_ori(:,:,2,ii)+rspauli_ori(:,:,3,ii)
-            ! enddo
+            do ii = 1,rvecnum
+                hops(:,:,ii)=hops(:,:,ii)+rspauli_final(:,:,1,ii)+rspauli_final(:,:,2,ii)+rspauli_final(:,:,3,ii) + &
+                rspauli_ori(:,:,1,ii)+rspauli_ori(:,:,2,ii)+rspauli_ori(:,:,3,ii)
+            enddo
         endif
     endif
      ! rspauli_final = 
 
     if(irank.eq.0)then
-    open(555,file='new_rspauli1')
-    ! open(987,file='rspauli_ori')
-    ! open(567,file='rspauli_final')
+    ! open(555,file='new_rspauli1')
+    open(987,file='rspauli_ori')
+    open(567,file='rspauli_final')
     do ii = 1, rvecnum
         do i = 1, num_wann
             do j= 1, num_wann
                 do dir =1,3
-                    write(444,'(6I5,3F16.8)') irvec(1,ii) ,irvec(2,ii), irvec(3,ii), j,i, dir, rspauli1(j,i,dir,ii)
-                    ! write(987,'(6I5,3F16.8)') irvec(1,ii) ,irvec(2,ii),irvec(3,ii), j,i, dir, rspauli_ori(j,i,dir,ii)
-                    ! write(567,'(6I5,3F16.8)') irvec(1,ii) ,irvec(2,ii), irvec(3,ii), j,i, dir, rspauli_final(j,i,dir,ii)
+                    ! write(444,'(6I5,3F16.8)') irvec(1,ii) ,irvec(2,ii), irvec(3,ii), j,i, dir, rspauli1(j,i,dir,ii)
+                    write(987,'(6I5,3F16.8)') irvec(1,ii) ,irvec(2,ii),irvec(3,ii), j,i, dir, rspauli_ori(j,i,dir,ii)
+                    write(567,'(6I5,3F16.8)') irvec(1,ii) ,irvec(2,ii), irvec(3,ii), j,i, dir, rspauli_final(j,i,dir,ii)
                 enddo
             enddo
         enddo
     enddo
     
-    ! close(567)
-    ! close(987)
-    close(555)
+    close(567)
+    close(987)
+    ! close(555)
     endif  
 
     if(irank.eq.0)then
@@ -664,9 +664,9 @@ program anomalous_nernst_effect
     allocate(eigvecs_z(num_wann,num_wann))  
     allocate(mat_temp(num_wann,num_wann))
     allocate(spin_sigma_temp(num_wann,num_wann))    
-    allocate(spin_sigma_x_comp(num_wann,num_wann))
-    allocate(spin_sigma_y_comp(num_wann,num_wann))
-    allocate(spin_sigma_z_comp(num_wann,num_wann))  
+    allocate(spin_sigma_x_comp(num_wann))
+    allocate(spin_sigma_y_comp(num_wann))
+    allocate(spin_sigma_z_comp(num_wann))  
 
     lwork=12.0*num_wann 
 
@@ -731,11 +731,13 @@ program anomalous_nernst_effect
         spin_sigma_x_comp = 0.0d0
         spin_sigma_y_comp = 0.0d0
         spin_sigma_z_comp = 0.0d0
-
-        spin_sigma_x_comp = MATMUL(eigvecs_dag(:,:),MATMUL(spin_sigma_x,eigvecs(:,:)))
-        spin_sigma_y_comp = MATMUL(eigvecs_dag(:,:),MATMUL(spin_sigma_y,eigvecs(:,:)))
-        spin_sigma_z_comp = MATMUL(eigvecs_dag(:,:),MATMUL(spin_sigma_z,eigvecs(:,:)))
-  
+        
+        do m=1,num_wann
+            spin_sigma_x_comp(m) = MATMUL(eigvecs_dag(:,m),MATMUL(spin_sigma_x,eigvecs(:,m)))
+            spin_sigma_y_comp(m) = MATMUL(eigvecs_dag(:,m),MATMUL(spin_sigma_y,eigvecs(:,m)))
+            spin_sigma_z_comp(m) = MATMUL(eigvecs_dag(:,m),MATMUL(spin_sigma_z,eigvecs(:,m)))
+        enddo
+        
         ! spin_sigma_x_comp = MATMUL(MATMUL(eigvecs_x,spin_sigma_x),conjg(transpose(eigvecs_x))
         ! spin_sigma_y_comp = MATMUL(MATMUL(eigvecs_y,spin_sigma_y),conjg(transpose(eigvecs_y))
         ! spin_sigma_z_comp = MATMUL(MATMUL(eigvecs_z,spin_sigma_z),conjg(transpose(eigvecs_z))
@@ -764,13 +766,13 @@ program anomalous_nernst_effect
 
         do m=1,num_wann
             
-            spin_texture(ik,:,1) = spin_sigma_x_comp(:,m)
-            spin_texture(ik,:,2) = spin_sigma_y_comp(:,m)
-            spin_texture(ik,:,3) = spin_sigma_z_comp(:,m)
+            spin_texture(ik,m,1) = spin_sigma_x_comp(m)
+            spin_texture(ik,m,2) = spin_sigma_y_comp(m)
+            spin_texture(ik,m,3) = spin_sigma_z_comp(m)
             
-            spin_dir(1,m) = spin_sigma_x_comp(m,m)
-            spin_dir(2,m) = spin_sigma_y_comp(m,m)
-            spin_dir(3,m) = spin_sigma_z_comp(m,m)
+            spin_dir(1,m) = spin_sigma_x_comp(m)
+            spin_dir(2,m) = spin_sigma_y_comp(m)
+            spin_dir(3,m) = spin_sigma_z_comp(m)
         
         enddo
         ! spin_texture(ik,:,1)=eigvals_x
