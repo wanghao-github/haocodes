@@ -736,10 +736,6 @@ program anomalous_nernst_effect
         spin_sigma_y_comp = MATMUL(eigvecs_dag(:,:),MATMUL(spin_sigma_y,eigvecs(:,:)))
         spin_sigma_z_comp = MATMUL(eigvecs_dag(:,:),MATMUL(spin_sigma_z,eigvecs(:,:)))
   
-        ! spin_sigma_x_comp=(MATMUL(MATMUL(eigvecs,spin_sigma_x),eigvecs_dag)+MATMUL(MATMUL(eigvecs_dag,spin_sigma_x),eigvecs))/2
-        ! spin_sigma_y_comp=(MATMUL(MATMUL(eigvecs,spin_sigma_y),eigvecs_dag)+MATMUL(MATMUL(eigvecs_dag,spin_sigma_y),eigvecs))/2
-        ! spin_sigma_z_comp=(MATMUL(MATMUL(eigvecs,spin_sigma_z),eigvecs_dag)+MATMUL(MATMUL(eigvecs_dag,spin_sigma_z),eigvecs))/2
-
         ! spin_sigma_x_comp = MATMUL(MATMUL(eigvecs_x,spin_sigma_x),conjg(transpose(eigvecs_x))
         ! spin_sigma_y_comp = MATMUL(MATMUL(eigvecs_y,spin_sigma_y),conjg(transpose(eigvecs_y))
         ! spin_sigma_z_comp = MATMUL(MATMUL(eigvecs_z,spin_sigma_z),conjg(transpose(eigvecs_z))
@@ -768,9 +764,9 @@ program anomalous_nernst_effect
 
         do m=1,num_wann
             
-            spin_texture(ik,m,1) = spin_sigma_x_comp(m,m)
-            spin_texture(ik,m,2) = spin_sigma_y_comp(m,m)
-            spin_texture(ik,m,3) = spin_sigma_z_comp(m,m)
+            spin_texture(ik,m,1) = spin_sigma_x_comp(:,m)
+            spin_texture(ik,m,2) = spin_sigma_y_comp(:,m)
+            spin_texture(ik,m,3) = spin_sigma_z_comp(:,m)
             
             spin_dir(1,m) = spin_sigma_x_comp(m,m)
             spin_dir(2,m) = spin_sigma_y_comp(m,m)
