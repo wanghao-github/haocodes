@@ -18,7 +18,7 @@ program anomalous_nernst_effect
     real               :: phas 
     complex            :: fac,fac2,zi
     complex,allocatable:: ham(:,:),spin_sigma_x(:,:),spin_sigma_y(:,:),spin_sigma_z(:,:),spin_sigma_temp(:,:)
-    complex,allocatable:: spin_sigma_x_comp(:),spin_sigma_y_comp(:),spin_sigma_z_comp(:),spin_sigma_t_mpi(:,:),spin_sigma_t_mpi2(:,:)
+    complex,allocatable:: spin_sigma_x_comp(:,:),spin_sigma_y_comp(:,:),spin_sigma_z_comp(:,:),spin_sigma_t_mpi(:,:),spin_sigma_t_mpi2(:,:)
     real               :: vl,vu 
     integer            :: ne,j 
     real               :: abstol,time_start,time_end ,time_start1,time_end1
@@ -664,9 +664,9 @@ program anomalous_nernst_effect
     allocate(eigvecs_z(num_wann,num_wann))  
     allocate(mat_temp(num_wann,num_wann))
     allocate(spin_sigma_temp(num_wann,num_wann))    
-    allocate(spin_sigma_x_comp(num_wann))
-    allocate(spin_sigma_y_comp(num_wann))
-    allocate(spin_sigma_z_comp(num_wann))  
+    allocate(spin_sigma_x_comp(num_wann,num_wann))
+    allocate(spin_sigma_y_comp(num_wann,num_wann))
+    allocate(spin_sigma_z_comp(num_wann,num_wann))  
 
     lwork=12.0*num_wann 
 
@@ -732,11 +732,9 @@ program anomalous_nernst_effect
         spin_sigma_y_comp = 0.0d0
         spin_sigma_z_comp = 0.0d0
         
-        do m=1,num_wann
-            spin_sigma_x_comp(m) = MATMUL(eigvecs_dag(m,:),MATMUL(spin_sigma_x,eigvecs(:,m)))
-            spin_sigma_y_comp(m) = MATMUL(eigvecs_dag(m,:),MATMUL(spin_sigma_y,eigvecs(:,m)))
-            spin_sigma_z_comp(m) = MATMUL(eigvecs_dag(m,:),MATMUL(spin_sigma_z,eigvecs(:,m)))
-        enddo
+        spin_sigma_x_comp = MATMUL(eigvecs_dag(:,:),MATMUL(spin_sigma_x,eigvecs(:,:)))
+        spin_sigma_y_comp = MATMUL(eigvecs_dag(:,:),MATMUL(spin_sigma_y,eigvecs(:,:)))
+        spin_sigma_z_comp = MATMUL(eigvecs_dag(:,:),MATMUL(spin_sigma_z,eigvecs(:,:)))
         
         ! spin_sigma_x_comp = MATMUL(MATMUL(eigvecs_x,spin_sigma_x),conjg(transpose(eigvecs_x))
         ! spin_sigma_y_comp = MATMUL(MATMUL(eigvecs_y,spin_sigma_y),conjg(transpose(eigvecs_y))
@@ -766,13 +764,13 @@ program anomalous_nernst_effect
 
         do m=1,num_wann
             
-            spin_texture(ik,m,1) = spin_sigma_x_comp(m)
-            spin_texture(ik,m,2) = spin_sigma_y_comp(m)
-            spin_texture(ik,m,3) = spin_sigma_z_comp(m)
+            spin_texture(ik,:,1) = spin_sigma_x_comp(:,m)
+            spin_texture(ik,:,2) = spin_sigma_y_comp(:,m)
+            spin_texture(ik,:,3) = spin_sigma_z_comp(:,m)
             
-            spin_dir(1,m) = spin_sigma_x_comp(m)
-            spin_dir(2,m) = spin_sigma_y_comp(m)
-            spin_dir(3,m) = spin_sigma_z_comp(m)
+            spin_dir(1,m) = spin_sigma_x_comp(m,m)
+            spin_dir(2,m) = spin_sigma_y_comp(m,m)
+            spin_dir(3,m) = spin_sigma_z_comp(m,m)
         
         enddo
         ! spin_texture(ik,:,1)=eigvals_x
