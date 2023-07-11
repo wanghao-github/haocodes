@@ -764,9 +764,9 @@ program anomalous_nernst_effect
 
         do m=1,num_wann
             
-            spin_texture(ik,m,1) = spin_sigma_x_comp(:,m)
-            spin_texture(ik,m,2) = spin_sigma_y_comp(:,m)
-            spin_texture(ik,m,3) = spin_sigma_z_comp(:,m)
+            spin_texture(ik,:,1) = spin_sigma_x_comp(:,m)
+            spin_texture(ik,:,2) = spin_sigma_y_comp(:,m)
+            spin_texture(ik,:,3) = spin_sigma_z_comp(:,m)
             
             spin_dir(1,m) = spin_sigma_x_comp(m,m)
             spin_dir(2,m) = spin_sigma_y_comp(m,m)
