@@ -26,14 +26,16 @@ if __name__ == '__main__':
     ndim = 2*sdim+1
 
     hr = HR.from_file_large(ndim, sdim,'wannier90_hr.dat')
+    ##读取了hr文件
 
 # hr_mat(norbs,norbs,ndim,ndim) j,i,rz,ry,rx  <i|H(rx,ry,rz)|j>
     hr_mat = hr.get_hr_large()  # forced zeros version 
-
+    #这个get_hr_large获得了5列的内容 我感觉应该是ix iy iz m n
+    
 # backuped for checking whether {rot_R} is out of wannier90_hr.dat's rpts
     hr_mat0= hr_mat * 1.0 # times 1.0 in case of quotation
     hr_mats= hr_mat * 1.0 # times 1.0 in case of quotation
-
+    ##又把这个矩阵复制了两遍
     print "ispinor", ispinor
 
 #-------------- #-------------- #-------------- #-------------- #-------------- #--------------
@@ -48,16 +50,36 @@ if __name__ == '__main__':
         # pauli matrix (Sigma_y)^T * 1.0j, Sigma_y * 1.0j
         syl = np.zeros((2,2),dtype = np.complex128)
         syr = np.zeros((2,2),dtype = np.complex128)
+        
+        
+        ##设置sy矩阵 和泡利矩阵y差不多 少了个i
+        ##syl和syr应该是乘了一个-1
+        
         syl[0,1]=-1.0;syl[1,0]=1.0;syr[0,1]=1.0;syr[1,0]=-1.0;
         umata = np.zeros((norbs,norbs), dtype = np.complex128)
         umatl = np.zeros((norbs,norbs), dtype = np.complex128)
         umatb = np.zeros((norbs,norbs), dtype = np.complex128)
         umatr = np.zeros((norbs,norbs), dtype = np.complex128)
+        
+        ##设置了umat  ablr四个矩阵  维度是norbs
+        
+        
         for iorbs in range(nband):
             umata[2*iorbs:2*iorbs+2,2*iorbs:2*iorbs+2] = syl
             umatb[2*iorbs:2*iorbs+2,2*iorbs:2*iorbs+2] = syr
+                
+        ##他这个nband看上去像是 num_wann/2
+        
+        ##比如我的num_wann是48   那么他这个就是24, iorbs从0到23
+        # 
+        # umata  2:4,2:4 = syl
+        #        4:6,4:6 =syl
+        # 按我的理解这个umata和umatab 基矢是上下上下 矩阵是对角线上隔两行有两行
+        # 
+        
         # up up
         umatl[0:nband,0:nband] = umata[0:norbs:2,0:norbs:2]
+        #这个l矩阵就取出了横纵都是奇数的行列  感觉上是一行
         # up dn
         umatl[0:nband,nband:norbs] = umata[0:norbs:2,1:norbs:2]
         # dn up
