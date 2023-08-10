@@ -276,12 +276,9 @@
               positionmed(2,i) = wanniercenters(2,i1)+n-1
               positionmed(3,i) = wanniercenters(3,i1)
               layerdir(i) = (i-1)/num_wann+1
-              if(positionmed(2,i) < t1                        &
-      .and. positionmed(2,i) < positionmed(1,i)+t2            &
-      .and. positionmed(2,i) > t3                             &
-      .and. positionmed(2,i) > positionmed(1,i)+t4            &
-      .and. positionmed(1,i) > t5                             &
-      .and. positionmed(1,i) < t6                             &
+              if(positionmed(2,i) > -1*positionmed(1,i)+t1    &
+      .and. positionmed(2,i) < 0.5 * positionmed(1,i)+t2      &
+      .and. positionmed(2,i) >   2 * positionmed(1,i)+t3      &
       ) then  
 
             positions(1,i2) = positionmed(1,i)
