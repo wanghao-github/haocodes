@@ -108,11 +108,11 @@
                amat(1,1)*wannier_center(1,num_wann)+         &
                amat(2,1)*wannier_center(2,num_wann)+         &
                amat(3,1)*wannier_center(3,num_wann)
-            wannier_center_real(2, num_wann)=
+            wannier_center_real(2, num_wann)=                 &
                amat(1,2)*wannier_center(1,num_wann)+          &
                amat(2,2)*wannier_center(2,num_wann)+          &
-               amat(3,2)*wannier_center(3,num_wann)           &
-            wannier_center_real(3, num_wann)=
+               amat(3,2)*wannier_center(3,num_wann)           
+            wannier_center_real(3, num_wann)=                 &
                amat(1,3)*wannier_center(1,num_wann)+          &
                amat(2,3)*wannier_center(2,num_wann)+          &
                amat(3,3)*wannier_center(3,num_wann)           
@@ -212,7 +212,7 @@
       call mpi_barrier(mpi_comm_world,ierr)
       call MPI_Finalize(ierr)
 
-      end program hoti_version2
+      end program hoti_version_hao
 
       subroutine tri_cut(nwannexup,nwannexdown,num_wann,numa,rvecnum,  &
        excludeup,excludedown,numbers,irvec,hops,nrpts,wanniercenters,  &
@@ -391,21 +391,30 @@
             layery.ge.preadmin.and.layery.le.preadmax)then
            
             i2 =i2+1
-            if(atompos(2,i)<t1                   &
-       .and. atompos(2,i)<atompos(1,i)+t2        &
-       .and. atompos(2,i)>t3                     &
-       .and. atompos(2,i)>atompos(1,i)+t4        &
-       .and. atompos(1,i)>t5                     &
-       .and. atompos(1,i)<t6                     &
-       ) then
+            if(atompos(2,i)> -1*atompos(1,i)+t1    &
+         .and. atompos(2,i)<0.5*atompos(1,i)+t2    &
+         .and. atompos(2,i)>  2*atompos(1,i)+t3    &
+            )then
+            if(atompos(2,j)> -1*atompos(1,i)+t1    &
+         .and. atompos(2,j)<0.5*atompos(1,i)+t2    &
+         .and. atompos(2,j)>  2*atompos(1,i)+t3    &
+            )then
+
+      !       if(atompos(2,i)<t1                   &
+      !  .and. atompos(2,i)<atompos(1,i)+t2        &
+      !  .and. atompos(2,i)>t3                     &
+      !  .and. atompos(2,i)>atompos(1,i)+t4        &
+      !  .and. atompos(1,i)>t5                     &
+      !  .and. atompos(1,i)<t6                     &
+      !  ) then
    
-            if(atompos(2,j)<t1                   &
-       .and. atompos(2,j)<atompos(1,j)+t2        &
-       .and. atompos(2,j)>t3                     &
-       .and. atompos(2,j)>atompos(1,j)+t4        &
-       .and. atompos(1,j)>t5                     &
-       .and. atompos(1,j)<t6                     &
-       ) then
+      !       if(atompos(2,j)<t1                   &
+      !  .and. atompos(2,j)<atompos(1,j)+t2        &
+      !  .and. atompos(2,j)>t3                     &
+      !  .and. atompos(2,j)>atompos(1,j)+t4        &
+      !  .and. atompos(1,j)>t5                     &
+      !  .and. atompos(1,j)<t6                     &
+      !  ) then
               
             hi = atomorbital(i)
             hj = atomorbital(j)
